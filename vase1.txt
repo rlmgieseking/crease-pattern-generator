@@ -1,0 +1,28 @@
+# Simple vase
+SETUP
+  nGores  =  8 
+  gorewidth  2.0
+  radius     0.0
+end 
+add cone
+  height     0.0
+  radius     0.5
+end
+add cone
+  height     1.5
+  radius     1.0
+end
+add cone
+  height     0.5
+  radius     1.0
+  startedge  none
+end
+add cone
+  height     0.2
+  radius     0.5
+  startedge  none
+end 
+add cone
+  height     0.3
+  radius     0.6
+end
