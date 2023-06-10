@@ -14,38 +14,38 @@ import numpy as np
 #def write_svg_cp(filename, xdim, ydim, edgelist):
 def write_svg_cp(filename, shape, verts=False, edges=True, rules=True):
     # Layout notes:
-    # 1. All points are scaled by a factor of 100 (a gore width of 1 is 100 px)
+    # 1. All points are scaled by a factor of 100 (a gore width of 1 is 100 mm)
     # 2. SVG files use the top left corner as (0,0) instead of the bottom left.
     #    Y dimensions of all points are translated accordingly.
     
     svg = open(filename,'w')
-    xdim = str(shape.ngores*shape.gorewidth*100)
-    ydim = str(shape.currentheight2d*100)
+    xdim = str(shape.ngores*shape.gorewidth*10)
+    ydim = str(shape.currentheight2d*10)
     svg.write('''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg 
   xmlns="http://www.w3.org/2000/svg"
   id="svg8"
   version="1.1" 
   height="''' + ydim + '''mm" 
-  width="''' + xdim + '''mm">
+  width="'''  + xdim + '''mm">
 <g>
 ''')
     #svg.write('<rect x="0" y="0" height="10" width="10" ' +
     #          'style="fill:none;stroke:#000000;stroke-width:1">\n')
     if edges:
         for edge in shape.edges:
-            if edge.direction != 'U' or rules:
-                x1, y1 = str(edge.end1.pos2d[0,0] * 100), str(float(ydim) - edge.end1.pos2d[0,1] * 100)
-                x2, y2 = str(edge.end2.pos2d[0,0] * 100), str(float(ydim) - edge.end2.pos2d[0,1] * 100)
-                svg.write('  <line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" ') 
+            if rules or edge.direction != 'U':
+                x1, y1 = str(edge.end1.pos2d[0,0] * 10), str(float(ydim) - edge.end1.pos2d[0,1] * 10)
+                x2, y2 = str(edge.end2.pos2d[0,0] * 10), str(float(ydim) - edge.end2.pos2d[0,1] * 10)
+                svg.write('  <line x1="' + x1 + 'mm" y1="' + y1 + 'mm" x2="' + x2 + 'mm" y2="' + y2 + 'mm" ') 
                 if edge.direction == 'B':
-                    svg.write('stroke="black" stroke-width="3"')
+                    svg.write('stroke="black" stroke-width="2"')
                 elif edge.direction == 'M':
-                    svg.write('stroke="red" stroke-width="2"')
+                    svg.write('stroke="red" stroke-width="1.5"')
                 elif edge.direction == 'V':
-                    svg.write('stroke="blue" stroke-width="2"')
+                    svg.write('stroke="blue" stroke-width="1.5"')
                 else:
-                    svg.write('stroke="gray" stroke-width="0.5"')
+                    svg.write('stroke="gray" stroke-width="0.3"')
                 svg.write(' />\n')
     svg.write('</g>\n</svg>')
     svg.close()
