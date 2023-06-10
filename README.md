@@ -12,25 +12,28 @@ Comments start with the symbol #. Any text from the # to the end of the line wil
 ### Setup block:
 In most cases, the input file should start with a setup block. If not, the default setup parameters will be used. An example of a setup block is:
 
->setup
-
->  ngores     4
-
->  radius     0.5
-
->end 
+```setup
+ngores     4
+radius     0.5
+end 
+```
 
 The setup block must start with the word "setup" and end with the word "end". If there is text following "end" on the same line, it will be ignored. 
 
-Within the setup block, there are several options that can be set:
+Within the setup block, the possible options are:
 
 | Option      | Default | Description |
 | ------      | ------- | ----------- |
-| ngores      | 8       | Number of gores/facets/sides the model has (must be an integer) | 
-| gorewidth   | 1.0     | Width of each gore, in cm |
-| radius      | 0.0     | Initial inner radius of the cylinder |
-| cwrot       | False   | Initial direction of flanges surrounding the model, as viewed from above (counterclockwise by default, clockwise if cwrot = True) |
-| relativedim | True    | Sets whether later blocks should use relative dimensions (defined such that 1.0 is the  |
+| ngores      | 8       | Number of gores/facets/sides the model has. Must be an integer. | 
+| gorewidth   | 1.0     | Width of each gore, in cm. |
+| radius      | 0.0     | Initial inner radius of the model, usually at the bottom edge. By default, defined as a fraction of the maximum possible radius. If relativedim = False, defined in cm. |
+| cwrot       | False   | Initial direction of flanges surrounding the model, as viewed from above. Counterclockwise by default, clockwise if cwrot = True. |
+| relativedim | True    | Sets whether later blocks should use relative dimensions (defined as a fraction of the maximum possible radius given the number of gores and their width) or absolute dimensions (cm).  |
+
+
+### Model-building blocks
+
+There are several types of blocks that can be used to add various components to the model.
 
 
 
