@@ -130,16 +130,16 @@ class Model:
         #print(rotstart, rotend)
         # Generate new points for sub-cones between start and end points
         newpts = []
-        nsegs = math.ceil(nsegments/2)
+        #nsegs = math.ceil(nsegments/2)
         start_a = rotstart[1] / rotstart[0]**2
-        start_gap = rotstart[0] / nsegs
-        for i in range(nsegs):
+        start_gap = rotstart[0] / nsegments
+        for i in range(nsegments):
             x = rotstart[0] - i * start_gap
             newpts.append([x, start_a * x**2])
         newpts.append([0.0, 0.0])
         end_a = rotend[1] / rotend[0]**2
-        end_gap = rotend[0] / nsegs
-        for i in range(nsegs):
+        end_gap = rotend[0] / nsegments
+        for i in range(nsegments):
             x = (i+1) * end_gap
             newpts.append([x, end_a * x**2])
         #print(newpts)

@@ -21,7 +21,7 @@ curvedconevars = [['height',    float, 0.0],
                   ['startedge', str,   'auto'],
                   ['vertexheight',    float, 0.0],
                   ['vertexradius',    float, 0.0],
-                  ['nsegments',       int,   2]]
+                  ['nsegments',       int,   4]]
 diagshiftvars =  [['radius',      float, 0.0],
                   ['offsetfract', float, 0.0],
                   ['tiltrot',     float, 0.0],

@@ -11,7 +11,7 @@ from datetime import datetime
 t = []
 t.append(datetime.now())
 # Set up file names
-basefile = 'examples/vase2'
+basefile = 'examples/vase3'
 if '.' in basefile:
     basefile = basefile[:basefile.index('.')]
 inpfile = basefile+'.txt'

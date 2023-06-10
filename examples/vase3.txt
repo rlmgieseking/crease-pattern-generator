@@ -11,17 +11,17 @@ add cone
 end
 add cone
   height      0.5
-  radius      0.999
+  radius      1.0
 end
 add diagshift
-  radius       0.999
+  radius       0.5
   offsetfract  0.4
   tiltrot      0
 end
 add diagshift
-  radius       0.999
+  radius       1.0
   offsetfract  0.4
-  tiltrot      0
+  tiltrot      90
 end
 add cone
   height      0.5
