@@ -2,10 +2,10 @@
 """
 Cone class
 """
-from molecule import Molecule
+from utils.molecule import Molecule
 from copy import deepcopy
 import math
-import elements as el
+import utils.elements as el
 #from datetime import datetime
 
 class Cone(Molecule):
@@ -22,6 +22,7 @@ class Cone(Molecule):
         self.diffheight3d = diffheight3d
         self.endheight3d = startheight3d + diffheight3d
         self.angle = math.atan2(diffheight3d, (endradius - startradius))
+        #print('angle', self.angle)
         if self.incomingangle != None:
             self.anglediff = self.angle - self.incomingangle
         else:
@@ -43,7 +44,7 @@ class Cone(Molecule):
         
         # Generate points along the start edge, in order from left to right on page (cw around model)
         # Place first vertex pair in 3D space
-        innerscale = 1.0
+        visshift = 0.01
         if self.startverts and len(self.startverts) == self.ngores * 2 + 1:
             self.verts = self.startverts
         else:
@@ -52,13 +53,21 @@ class Cone(Molecule):
                 startouter3d = [self.startradius, -self.gorewidth/2, 0]
                 self.verts.append(el.Vertex([0.0, self.startheight2d], startouter3d))
                 self.verts[-1].rotate(-math.pi * 2 / self.ngores, 'z') 
-                startinner3d = [self.startradius, self.startradius * math.tan(math.pi/self.ngores) * innerscale, 0]
-                self.verts.append(el.Vertex([self.gorewidth/2 - self.startradius * math.tan(math.pi/self.ngores), self.startheight2d], startinner3d))
+                startinner3d = [self.startradius, self.startradius * math.tan(math.pi/self.ngores), 0]
+                startinner3dvis = [self.startradius - visshift, self.startradius * math.tan(math.pi/self.ngores), 0]
+                self.verts.append(el.Vertex([self.gorewidth/2 - self.startradius * math.tan(math.pi/self.ngores), 
+                                             self.startheight2d], 
+                                            startinner3d,
+                                            startinner3dvis))
             else: 
                 startouter3d = [self.startradius, self.gorewidth/2, 0]
                 self.verts.append(el.Vertex([0.0, self.startheight2d], startouter3d))
-                startinner3d = [self.startradius, -self.startradius * math.tan(math.pi/self.ngores) * innerscale, 0]
-                self.verts.append(el.Vertex([self.gorewidth/2 + self.startradius * math.tan(math.pi/self.ngores), self.startheight2d], startinner3d))
+                startinner3d = [self.startradius, -self.startradius * math.tan(math.pi/self.ngores), 0]
+                startinner3dvis = [self.startradius - visshift, -self.startradius * math.tan(math.pi/self.ngores), 0]
+                self.verts.append(el.Vertex([self.gorewidth/2 + self.startradius * math.tan(math.pi/self.ngores), 
+                                             self.startheight2d], 
+                                            startinner3d,
+                                            startinner3dvis))
     
             # Replicate verts for each gore, with the correct rotations and translations
             for i in range(1, self.ngores):
@@ -82,13 +91,21 @@ class Cone(Molecule):
             endouter3d = [self.endradius, -self.gorewidth/2, self.diffheight3d]
             self.verts.append(el.Vertex([0.0, self.endheight2d], endouter3d))
             self.verts[-1].rotate(-math.pi * 2 / self.ngores, 'z') 
-            endinner3d = [self.endradius, self.endradius * math.tan(math.pi/self.ngores) * innerscale, self.diffheight3d]
-            self.verts.append(el.Vertex([self.gorewidth/2 - self.endradius * math.tan(math.pi/self.ngores), self.endheight2d], endinner3d))
+            endinner3d = [self.endradius, self.endradius * math.tan(math.pi/self.ngores), self.diffheight3d]
+            endinner3dvis = [self.endradius - visshift, self.endradius * math.tan(math.pi/self.ngores), self.diffheight3d]
+            self.verts.append(el.Vertex([self.gorewidth/2 - self.endradius * math.tan(math.pi/self.ngores), 
+                                         self.endheight2d], 
+                                        endinner3d,
+                                        endinner3dvis))
         else: 
             endouter3d = [self.endradius, self.gorewidth/2, self.diffheight3d]
             self.verts.append(el.Vertex([0.0, self.endheight2d], endouter3d))
-            endinner3d = [self.endradius, -self.endradius * math.tan(math.pi/self.ngores) * innerscale, self.diffheight3d]
-            self.verts.append(el.Vertex([self.gorewidth/2 + self.endradius * math.tan(math.pi/self.ngores), self.endheight2d], endinner3d))
+            endinner3d = [self.endradius, -self.endradius * math.tan(math.pi/self.ngores), self.diffheight3d]
+            endinner3dvis = [self.endradius - visshift, -self.endradius * math.tan(math.pi/self.ngores), self.diffheight3d]
+            self.verts.append(el.Vertex([self.gorewidth/2 + self.endradius * math.tan(math.pi/self.ngores), 
+                                         self.endheight2d], 
+                                        endinner3d,
+                                        endinner3dvis))
         
         # Replicate verts for each gore, with the correct rotations and translations
         for i in range(1, self.ngores):
@@ -122,9 +139,9 @@ class Cone(Molecule):
                 self.edges.append(el.Edge(self.verts[i+1],                   self.verts[i+2], 'B'))
         # Correct directions of start edges
         for i in range(0, self.ngores*2, 2):
-            if not self.anglediff:
+            if self.anglediff == None:
                 pass
-            elif self.anglediff == 0 or self.startedgetype == 'none':
+            elif abs(self.anglediff) < 0.01 or self.startedgetype == 'none':
                 self.edges[i].direction   = 'U'
                 self.edges[i+1].direction = 'U'
             elif (self.anglediff > 0 and not self.cwrot) or (self.anglediff < 0 and self.cwrot):

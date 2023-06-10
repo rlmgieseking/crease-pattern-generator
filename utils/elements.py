@@ -23,9 +23,13 @@ Functions:
         the correct number of values and that all values are numbers
 """
 class Vertex:
-    def __init__(self, pos2d, pos3d):
+    def __init__(self, pos2d, pos3d, pos3dvis = None):
         self.pos2d = np.array([pos2d]).astype(float)
         self.pos3d = np.array([pos3d]).astype(float)
+        if pos3dvis:
+            self.pos3dvis = np.array([pos3dvis]).astype(float)
+        else:
+            self.pos3dvis = self.pos3d
         #if len(self.pos2d) != 2 or len(self.pos3d) != 3:
         #    print(print("Error: Position ", self.pos2d, self.pos3d, " is invalid"))
         self.check_valid_position_format()
@@ -37,6 +41,8 @@ class Vertex:
             print("Error: 2D position ", self.pos2d, " is invalid")
         if self.pos3d.shape != (1, 3):
             print("Error: 3D position ", self.pos3d, " is invalid")
+        if self.pos3dvis.shape != (1, 3):
+            print("Error: 3D position for visualization ", self.pos3dvis, " is invalid")
         #print(self.pos2d, self.pos3d)
         return
     
@@ -47,6 +53,7 @@ class Vertex:
     def translate3d(self, distance):
         distance = np.array(distance)
         self.pos3d += distance
+        self.pos3dvis += distance
     
     # Rotates clockwise around the specified axis. Angle in radians.
     def rotate(self, theta, axis):
@@ -63,6 +70,7 @@ class Vertex:
                               [-math.sin(theta), math.cos(theta), 0 ],
                               [ 0              , 0              , 1 ]])
         self.pos3d = np.array((rmat * self.pos3d.reshape((3,1))).reshape(3))
+        self.pos3dvis = np.array((rmat * self.pos3dvis.reshape((3,1))).reshape(3))
     
 """
 Edge attributes:
@@ -113,12 +121,12 @@ Face attributes:
     Color (to be used later)
 """
 class Face:
-    def __init__(self, verts = [], edges = [], edgelist=[], color=(1.0, 1.0, 1.0)):
+    def __init__(self, verts = [], edges = [], edgelist=[], color=(0.8, 0.8, 0.8)):
         self.verts = verts
         self.edges = edges
         self.color = color
         
-        #self.checkValid(edgelist)
+        self.checkValid(edgelist)
         return
     
     # If face is defined based only on a list of verts, 
@@ -163,7 +171,8 @@ class Face:
             vec1 = self.verts[1].pos3d - self.verts[0].pos3d
             vec2 = self.verts[2].pos3d - self.verts[0].pos3d
             self.normal = np.cross(vec1, vec2)
-            self.normal /= np.linalg.norm(self.normal)
+            if np.linalg.norm(self.normal) > 0:
+                self.normal /= np.linalg.norm(self.normal)
             #print(self.normal)
         # Check coplanarity of vertices
         self.coplanar = True

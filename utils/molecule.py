@@ -5,7 +5,7 @@ Molecules are collections of elements for a segment of the final form
 """
 import math
 import numpy as np
-import elements as el
+import utils.elements as el
 from copy import deepcopy
 from scipy.optimize import fsolve
 
@@ -57,19 +57,25 @@ class Molecule:
             vertex.rotate(phi, 'z')
     
     # Translate to the correct offset for the final height
-    def translate3d(self):
+    def translate3d(self, xy = True, z = True):
         # If startverts exist, they are already positioned correctly
         # Position only vertices after startverts
+        #print('translate center',self.center, self.startheight3d)
         for vertex in self.verts[self.nstartverts:]:
-            vertex.translate3d([self.center[0], self.center[1], self.startheight3d])
+            if xy and z:
+                vertex.translate3d([self.center[0], self.center[1], self.startheight3d])
+            elif xy: 
+                vertex.translate3d([self.center[0], self.center[1], 0.0])
+            elif z:
+                vertex.translate3d([0.0, 0.0, self.startheight3d])
     
     # Function to compute heights of vertices given convergence point xyz coords.
     # Height of first inner vertex is defined as 0
     # Input vector h has indices [conv3d, hi (starting at 1)]
     # conv = xy coordinates of convergence point
     # toptwist = True if paper goes up to convergence point, False if down
-    def heights(self, h, verts, conv=[0,0], toptwist = True):
-        fac = 1e-4
+    def heights(self, h, verts, conv=[0,0], toptwist = True, startheight3d=0):
+        fac = 1e-6
         error = []
             
         # Check deviation from coplanarity for convergence point
@@ -88,9 +94,11 @@ class Molecule:
         #print('pos', verts[i].pos3d, verts[j].pos3d, h[(j+1)//2], verts[k].pos3d, h[(k+1)//2])
         #print('normal',normal, vec1, vec2)
         vec = conv3d - verts[i].pos3d
+        vec[0,2] += startheight3d
         #print('vec', conv3d, verts[i].pos3d, vec)
         #print('dot', float(np.tensordot(normal, vec)))
-        error.append(float(np.tensordot(normal, vec)) + fac*abs(h[i]))
+        #error.append(float(np.tensordot(normal, vec)) + fac*abs(h[i])**2 - startheight3d)
+        error.append(float(np.tensordot(normal, vec)) + fac*abs(h[i])**2)
             
         # Compute target paper length based on first inner vertex
         dist3d = math.sqrt((verts[1].pos3d[0,0] - conv[0])**2 +
@@ -106,11 +114,11 @@ class Molecule:
                                (verts[i*2+1].pos3d[0,1] - conv[1])**2 +
                                (h[i] - h[0])**2)
             #print('dist', dist3d, target)
-            dy2d = math.sqrt(dist3d**2 - dx2d**2)
+            dy2d = math.sqrt(abs(dist3d**2 - dx2d**2))
             if toptwist:
-                error.append(target - dy2d - h[i] + fac*abs(h[i]))
+                error.append(target - dy2d - h[i] + fac*abs(h[i])**2)
             else:
-                error.append(target - dy2d + h[i] + fac*abs(h[i]))
+                error.append(target - dy2d + h[i] + fac*abs(h[i])**2)
         
         #print(error)
         return error
@@ -147,42 +155,66 @@ class Molecule:
         
         return error
 
-    def generatehalftwist(self, verts, conv3d, toptwist=True):
+    def generatehalftwist(self, verts, conv3d, center, offsetfract, toptwist=True):
+        minheight2d = self.startheight2d if toptwist else 0
+        minheight3d = self.startheight3d if toptwist else 0
+        #print('height', minheight2d, minheight3d)
         # Solve heights function to get the actual heights of the points
         if toptwist:
-            init = np.array([1] + [0] * (self.ngores - 1))
+            init = np.array([0.01] + [0] * (self.ngores - 1))
         else:
-            init = np.array([-1] + [0] * (self.ngores - 1))
-        zpos = fsolve(self.heights, init, args=(verts, conv3d[0,0:2], toptwist))
+            init = np.array([-0.01] + [0] * (self.ngores - 1))
+        # For relatively small offsets, solve directly
+        # For larger offsets, solve for a smaller offset, then scale up
+        if offsetfract < 0.3:
+            zpos = fsolve(self.heights, init, args=(verts, conv3d[0,0:2], toptwist, minheight3d))
+        else:
+            for s in np.arange(0.2, offsetfract, 0.1):
+                convtemp = [conv3d[0,0] * s + center[0] * (1-s),
+                            conv3d[0,1] * s + center[1] * (1-s)]
+                init = fsolve(self.heights, init, args=(verts, convtemp, toptwist, minheight3d))
+            zpos = fsolve(self.heights, init, args=(verts, conv3d[0,0:2], toptwist, minheight3d))
+            
         minz = min(0, min(zpos[1:])) if toptwist else max(0,max(zpos[1:]))
-        print('zpos',zpos)
+        #for v in verts:
+        #    print(v.pos2d, v.pos3d)
+        #print('zpos',zpos)
+        #print('conv', conv3d[0,0:2], minheight3d)
         #print('error',self.heights(zpos, verts, conv3d[0,0:2], True))
-        conv3d[0,2] = zpos[0] - minz
-        print('conv3d',conv3d)
+        conv3d[0,2] = zpos[0] - minz + minheight3d
+        #print('conv3d',conv3d)
         if toptwist:
-            conv2d = - minz + math.sqrt((verts[1].pos3d[0,0] - conv3d[0,0])**2 +
+            conv2d = (- minz + minheight2d
+                      + math.sqrt((verts[1].pos3d[0,0] - conv3d[0,0])**2 +
                                         (verts[1].pos3d[0,1] - conv3d[0,1])**2 +
                                         (0 - zpos[0])**2 - 
-                                        (verts[1].pos2d[0,0] - self.gorewidth/2)**2)
+                                        (verts[1].pos2d[0,0] - self.gorewidth/2)**2)) 
+            
         else:
-            conv2d = - minz - math.sqrt((verts[1].pos3d[0,0] - conv3d[0,0])**2 +
+            conv2d = (- minz + minheight2d
+                      - math.sqrt((verts[1].pos3d[0,0] - conv3d[0,0])**2 +
                                         (verts[1].pos3d[0,1] - conv3d[0,1])**2 +
                                         (0 - zpos[0])**2 - 
-                                        (verts[1].pos2d[0,0] - self.gorewidth/2)**2)
+                                        (verts[1].pos2d[0,0] - self.gorewidth/2)**2))
         #print('conv',conv3d, conv2d)
         dfrac = (min(self.gorewidth - verts[1].pos2d[0,0], verts[1].pos2d[0,0])/
                  (2*abs(verts[1].pos2d[0,0] - self.gorewidth/2)))
         zpos[0] = 0.0
         #print('dfrac',dfrac)
-        newmin = 0
+        newmin = minheight3d
         
         # Add new points for transition from cylinder to shift
         # Outer vertices get placeholder heights, corrected in next step
         for i in range(self.ngores*2+1):
             verts.append(deepcopy(verts[i]))
             if i % 2 == 1:
-                verts[-1].pos3d[0,2] = - minz + zpos[(i-1)//2]
-                verts[-1].pos2d[0,1] = - minz + zpos[(i-1)//2]
+                verts[-1].pos3d[0,2] = - minz + zpos[(i-1)//2] + minheight3d
+                verts[-1].pos3dvis[0,2] = - minz + zpos[(i-1)//2] + minheight3d
+                verts[-1].pos2d[0,1] = - minz + zpos[(i-1)//2] + minheight2d
+                #if (toptwist and self.cwrot) or (not toptwist and not self.cwrot):
+                #    verts[-1].pos3dvis[0,2] -= 0.01
+                #else:
+                #    verts[-1].pos3dvis[0,2] += 0.01
             else:
                 if self.cwrot:
                     if i == 0:
@@ -198,17 +230,20 @@ class Molecule:
                         h = - minz + zpos[(i-2)//2] - dfrac * (zpos[0] - zpos[(i-2)//2])
                     else:
                         h = - minz + zpos[(i-2)//2] - dfrac * (zpos[(i)//2] - zpos[(i-2)//2])
-                verts[-1].pos3d[0,2] = h
-                verts[-1].pos2d[0,1] = h
+                verts[-1].pos3d[0,2] = h + minheight3d
+                verts[-1].pos3dvis[0,2] = h + minheight3d
+                verts[-1].pos2d[0,1] = h + minheight2d
             newmin = min(newmin, verts[-1].pos3d[0,2]) if toptwist else max(newmin, verts[-1].pos3d[0,2])
         # If the new lowest vertex is below 0, correct all the vertices
+        #print(newmin, minheight3d)
         if newmin != 0:
             for i in range(self.ngores*2+1):
-                verts[i + self.ngores*2+1].pos3d[0,2] -= newmin
-                verts[i + self.ngores*2+1].pos2d[0,1] -= newmin
-            conv2d -= newmin
-            conv3d[0,2] -= newmin
-        print('conv3d',conv3d)
+                verts[i + self.ngores*2+1].pos3d[0,2] -= newmin - minheight3d
+                verts[i + self.ngores*2+1].pos3dvis[0,2] -= newmin - minheight3d
+                verts[i + self.ngores*2+1].pos2d[0,1] -= newmin - minheight3d
+            conv2d -= newmin - minheight3d
+            conv3d[0,2] -= newmin - minheight3d
+        #print('conv3d',conv3d)
         # Add vertices surrounding convergence point 
         # Inner vertices get exact positions
         # Outer vertices get placeholder 3D positions to be fixed in the next step
@@ -220,13 +255,13 @@ class Molecule:
             z13 = verts[i1].pos3d[0,2] - verts[i3].pos3d[0,2]
             d13 = math.sqrt(x13**2 + y13**2 + z13**2)
             if self.cwrot:
-                xd = (self.gorewidth/2) * x13 / d13
-                yd = (self.gorewidth/2) * y13 / d13
-                zd = (self.gorewidth/2) * z13 / d13
-            else:
                 xd = -(self.gorewidth/2) * x13 / d13
                 yd = -(self.gorewidth/2) * y13 / d13
                 zd = -(self.gorewidth/2) * z13 / d13
+            else:
+                xd = (self.gorewidth/2) * x13 / d13
+                yd = (self.gorewidth/2) * y13 / d13
+                zd = (self.gorewidth/2) * z13 / d13
             verts.append(el.Vertex([self.gorewidth*i/2, conv2d],
                                         [conv3d[0,0] + xd, conv3d[0,1] + yd, conv3d[0,2] + zd]))
             verts.append(el.Vertex([self.gorewidth*(i+1)/2 , conv2d],
@@ -245,6 +280,8 @@ class Molecule:
             dy = abs(verts[vertind[0]].pos2d[0,1] - verts[v].pos2d[0,1])
             #print(verts[v].pos3d)
             verts[v].pos3d = np.array([fsolve(self.locpt,verts[v].pos3d, 
+                                         args=(dx, dy, verts, vertind))])
+            verts[v].pos3dvis = np.array([fsolve(self.locpt,verts[v].pos3dvis, 
                                          args=(dx, dy, verts, vertind))])
             #print(self.locpt(verts[v].pos3d, dx, dy, verts, vertind))
         

@@ -1,10 +1,10 @@
 # Simple vase
 setup
-  ngores  =  10
+  ngores  =  4
   gorewidth  1.0
-  radius     1.0
+  radius     0.5
 end 
 add cone
   height     1.0
-  radius     1.0
+  radius     0.5
 end

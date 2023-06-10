@@ -5,12 +5,9 @@ Created on Wed Jan  4 14:34:02 2023
 @author: gieseking
 """
 
-import elements as el
 import math
-import numpy as np
-from cone import Cone
-from diagshift import DiagonalShift
-from datetime import datetime
+from utils.cone import Cone
+from utils.diagshift import DiagonalShift
 
 # Contains master list of all elements for the full model
 class Model:
@@ -57,9 +54,9 @@ class Model:
         if abs(endradius) > self.maxradius:
             print("Error: Radius of ", str(endradius), 
                   "exceeds the maximum possible radius of ", str(self.maxradius))
-            endradius = self.maxradius * 0.999
+            endradius = self.maxradius * 0.99999
         elif abs(endradius) == self.maxradius:
-            endradius = self.maxradius * 0.999
+            endradius = self.maxradius * 0.99999
         if len(self.molecules) > 0:
             startverts, startedges = self.molecules[-1].endverts, self.molecules[-1].endedges
         else:
@@ -79,12 +76,14 @@ class Model:
             phi = math.atan2(self.currentaxis[1], self.currentaxis[0])
             theta = math.acos(self.currentaxis[2]/math.sqrt(self.currentaxis[0]**2 + self.currentaxis[1]**2 + self.currentaxis[2]**2))
             self.currentheight3d  += diffheight3d * math.cos(theta)
-            self.currentcenter[0] -= diffheight3d * math.sin(theta) * math.cos(phi)
-            self.currentcenter[1] += diffheight3d * math.sin(theta) * math.sin(phi)
+            self.currentcenter[0] += diffheight3d * math.sin(theta) * math.cos(phi)
+            self.currentcenter[1] -= diffheight3d * math.sin(theta) * math.sin(phi)
         self.currentangle = self.molecules[-1].angle
         #print('Update mod',datetime.now())
         
         # Add vertices and edges not in existing lists
+        #print(len(self.molecules[-1].verts), len(self.verts), len(startverts))
+        
         self.add_verts(self.molecules[-1])
         #print('Add  verts',datetime.now())
         self.add_edges(self.molecules[-1])
@@ -170,6 +169,38 @@ class Model:
                                             startverts, startedges,
                                             self.currentangle, self.xyrot, self.currentaxis, self.currentcenter,
                                             startedgetype, endradius, offsetfract, tiltrot))
+        # Update current radius and height to match the end of the shift
+        
+        diffheight3d = self.molecules[-1].verts[-1].pos3d[0,2] - self.currentheight3d
+        self.cwrot = not self.cwrot
+        self.currentradius = endradius
+        self.currentheight2d = self.molecules[-1].endheight2d
+        if self.currentaxis == [0,0,1]:
+            self.currentheight3d += diffheight3d
+        else:
+            phi = math.atan2(self.currentaxis[1], self.currentaxis[0])
+            theta = math.acos(self.currentaxis[2]/math.sqrt(self.currentaxis[0]**2 + self.currentaxis[1]**2 + self.currentaxis[2]**2))
+            self.currentheight3d  += diffheight3d * math.cos(theta)
+            self.currentcenter[0] -= diffheight3d * math.sin(theta) * math.cos(phi)
+            self.currentcenter[1] += diffheight3d * math.sin(theta) * math.sin(phi)
+        self.currentcenter = self.molecules[-1].center
+        #print('center',self.currentcenter)
+        self.currentangle = self.molecules[-1].angle
+        if self.cwrot:
+            self.xyrot -= 2 * math.pi * (self.ngores/2 - 1) / self.ngores
+        else:
+            self.xyrot += 2 * math.pi * (self.ngores/2 - 1) / self.ngores
+        #print('Update mod',datetime.now())
+        
+        # Add vertices and edges not in existing lists
+        self.add_verts(self.molecules[-1])
+        #print('Add  verts',datetime.now())
+        self.add_edges(self.molecules[-1])
+        #print('Add  edges',datetime.now())
+        self.add_faces(self.molecules[-1])
+        #print("# edges = ", len(self.edges))
+        #print('Add faces',datetime.now())
+        '''
         # Update current radius and height to match the end of the cone
         self.currentradius = endradius
         self.currentheight2d = self.molecules[-1].endheight2d
@@ -188,6 +219,7 @@ class Model:
         self.add_verts(self.molecules[-1])
         self.add_edges(self.molecules[-1])
         self.add_faces(self.molecules[-1])
+        '''
     
     # Add new vertices from a molecule to the master list
     #

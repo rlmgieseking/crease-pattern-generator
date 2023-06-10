@@ -1,0 +1,33 @@
+# Diagonal shift with cones before/after
+setup
+  ngores      8
+  gorewidth   2.0
+  radius      0.5
+  cwrot       True
+end 
+add cone
+  height      0.3
+  radius      0.8
+end
+add cone
+  height      0.5
+  radius      0.999
+end
+add diagshift
+  radius       0.999
+  offsetfract  0.4
+  tiltrot      0
+end
+add diagshift
+  radius       0.999
+  offsetfract  0.4
+  tiltrot      0
+end
+add cone
+  height      0.5
+  radius      0.8
+end
+add cone
+  height      0.3
+  radius      0.5
+end

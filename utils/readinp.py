@@ -5,7 +5,8 @@ Created on Thu Mar  9 16:28:19 2023
 @author: gieseking
 """
 
-import model
+import utils.model as model
+import utils.display as display
 
 # Define variables available for each block and their default values
 setupvars = [['ngores',    int,   8], 
@@ -25,6 +26,23 @@ diagshiftvars =  [['radius',      float, 0.0],
                   ['offsetfract', float, 0.0],
                   ['tiltrot',     float, 0.0],
                   ['startedge',   str,   'auto']]
+displayvars = [['svgcp',         bool, True],
+               ['svgcp_verts',   bool, False],
+               ['svgcp_edges',   bool, True],
+               ['svgcp_rules',   bool, False],
+               ['vpy',           bool, True],
+               ['vpy_verts',     bool, False],
+               ['vpy_edges',     bool, True],
+               ['vpy_faces',     bool, True],
+               ['vpy_image',     bool, True],
+               ['fold2d',         bool, True],
+               ['fold2d_verts',   bool, True],
+               ['fold2d_edges',   bool, True],
+               ['fold2d_faces',   bool, True],
+               ['fold3d',         bool, True],
+               ['fold3d_verts',   bool, True],
+               ['fold3d_edges',   bool, True],
+               ['fold3d_faces',   bool, True],]
 
 def getvar(block, varname, vartype, vardefault):
     var = None
@@ -136,6 +154,37 @@ def generatemodel(blocks):
                 if len(block) > 0:
                     print('Error: Variables', block, 'could not be interpreted. Ignoring these values.')
                 shape.add_diagshift(radius, offsetfract, tiltrot, startedge)
+            elif 'display' in block:
+                pass
             else:
                 print('Error: Block has undetermined component type. Ignoring block', block)
     return shape
+
+def displaymodel(shape, blocks, basefile):
+    # Set variables to defaults
+    for [varname, vartype, vardefault] in displayvars:
+        #print(varname, vartype)
+        block, var = getvar([], varname, vartype, vardefault)
+        exec("%s = %r" % (varname, var), globals())
+    # Look for display block
+    for block in blocks:
+        if 'display' not in block:
+            continue
+        block.remove('display')
+        for [varname, vartype, vardefault] in displayvars:
+            #print(varname, vartype)
+            block, var = getvar(block, varname, vartype, vardefault)
+            exec("%s = %r" % (varname, var), globals())
+        if len(block) > 0:
+            print('Error: Variables', block, 'could not be interpreted. Ignoring these values.')
+        
+    if svgcp:
+        display.write_svg_cp(basefile+'.svg', shape, verts=svgcp_verts, edges=svgcp_edges, rules=svgcp_rules)
+    if vpy:
+        display.vpython3d(basefile+'.png', shape, verts=vpy_verts, edges=vpy_edges, faces=vpy_faces, savefile=vpy_image)
+    if fold2d:
+        display.fold2d(basefile+'_2D.fold', shape, verts=fold2d_verts, edges=fold2d_edges, faces=fold2d_faces)
+    if fold3d:
+        display.fold3d(basefile+'_3D.fold', shape, verts=fold3d_verts, edges=fold3d_edges, faces=fold3d_faces)
+        
+    
