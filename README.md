@@ -40,7 +40,7 @@ Each component block must start with the command `add <component>`, where `<comp
 
 #### Cones
 
-Cones are the basic building block for rotationally symmetric solids. The 'cones' created by this code are actually truncated regular pyramids with ngores sides (where ngores was defined in the setup block), or prisms if the initial and final radius are the same. The radius at the initial edge (usually the bottom edge) of the cone is the radius from the setup block if this is the first component, or the radius from the previous component if this is not the first component. Because of this, only the height of the cone and its final radius are defined in this block. 
+Cones are the basic building block for rotationally symmetric solids. The 'cones' created by this code are actually truncated regular pyramids with `ngores` sides (where `ngores` was defined in the setup block), or prisms if the initial and final radius are the same. The radius at the initial edge (usually the bottom edge) of the cone is the radius from the setup block if this is the first component, or the radius from the previous component if this is not the first component. Because of this, only the height of the cone and its final radius are defined in this block. 
 
 An example of a cone block is:
 
@@ -61,7 +61,7 @@ Within the block, the possible options are:
 
 #### Curved cones
 
-Curved cones allow you to approximate a curved form using a series of cones. As for a single cone, the initial radius is set by default, and the final height and radius must be defined. In addition, you must define the shape of the curve. The curve is constructed by defining the point where the the paper is parallel to the line from the start point to the end point of the curved cone, called the vertex. Both the height and the radius of the vertex must be defined. 
+Curved cones allow you to approximate a curved form using a series of cones. As for a single cone, the initial radius is set by default, and the final height and radius must be defined. In addition, you must define the shape of the curve. The curve is constructed by defining the point where the the paper is parallel to the line from the start point to the end point of the curved cone, called the vertex. Both the height and the radius of the vertex must be defined. If the vertex is inset from the start-to-end line, the entire curve is concave; if it is further out, the entire curve is convex. Constructing an S-like curve requires one curved cone for the concave part and a second for the convex part.
 
 The curve is constructed based on two parabolas: one from the vertex to the start point, and one from the vertex to the end point. For both parabolas, the vertex of the parabola is the point defined as the vertex of the curved cone, and the directrix is parallel to the to the line from the start point to the end point of the curved cone. The width of each parabola is set to ensure that it passes through the start point or the end point as appropriate. 
 
