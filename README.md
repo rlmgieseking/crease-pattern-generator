@@ -3,13 +3,15 @@ Author: Rebecca Gieseking
 
 Orivase is a Python 3 script that generates crease patterns and 3D visualizations for origami vase forms. As of Version 0.1, the script can create forms based on cones (similar to the capabilities of the ORI-REVO package) and diagonal shifts.
 
-## Input file format
-The script reads a text-based input file and uses the information in that file to generate the output. The input format is fairly flexible about spacing, capitalization, number of lines, etc. 
+## Setup and Installation
 
-### Comments:
+## Input file format
+The script reads a text-based input file and uses the information in that file to generate the output. The input format is fairly flexible about spacing, capitalization, number of lines, etc. Several example input files are included in the `examples` directory
+
+### Comments
 Comments start with the symbol #. Any text from the # to the end of the line will be treated as a comment and discarded when the script reads the input file. The # may appear at the beginning or middle of any line.
 
-### Setup block:
+### Setup block
 In most cases, the input file should start with a setup block. If not, the default setup parameters will be used. An example of a setup block is:
 
 ```
@@ -87,7 +89,7 @@ Within the block, the possible options are:
 | nsegments   | 4       | Number of cones used to construct each half of the curve. For the default of 4, a total of 8 cones will be used. |
 | startedge   | auto    | Fold format for the first edge of the cone. If `auto`, the code will use the relative angle between this cone and the previous component to assign the fold as a mountain, valley, or rule line (flat). If 'none', the fold will be assigned as a rule line; this can be helpful if you are constructing an approximate curve from a series of cones. |
 
-# Diagonal shifts
+#### Diagonal shifts
 
 Diagonal shifts are a component that I designed around 2013 that create the appearance of slicing a cylinder along a diagonal and shifting the top half of the cylinder uphill along that diagonal, [see examples on my website](http://rebecca.gieseking.us/2013/08/test-models-diagonal-shift-part-2/). The diagonal shift is folded essentially as a twist, where the paper rotates (`ngores`/2 - 1)/`ngores` * 360 degrees. As `ngores` increases, the rotation angle approaches 180 degrees. In the center of the twist, `ngores` pleats come together to (approximately) one point, which I call the convergence point. This twist also causes the flanges to switch between clockwise and counterclockwise.
 
@@ -113,5 +115,5 @@ Within the block, the possible options are:
 | startedge   | auto    | Fold format for the first edge of the cone. If `auto`, the code will use the relative angle between this cone and the previous component to assign the fold as a mountain, valley, or rule line (flat). If 'none', the fold will be assigned as a rule line; this can be helpful if you are constructing an approximate curve from a series of cones. |
 
 
-
+### Display and output
 
