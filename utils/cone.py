@@ -1,13 +1,32 @@
 # -*- coding: utf-8 -*-
-"""
-Cone class
-"""
+
 from utils.molecule import Molecule
 from copy import deepcopy
 import math
 import utils.elements as el
-#from datetime import datetime
 
+"""
+Cone class
+Inherits from Molecule
+
+New attributes:
+    endradius: Radius of the cone at its final edge
+    diffheight3d: Difference between height at the start edge and height at the
+        end edge in 3D. Positive number means the cone goes up.
+    endheight3d: Height at the end edge in 3D
+    angle: Angle of the faces of the cone relative to its central axis
+    anglediff: Difference in angle between the faces of this cone and the faces
+        of the previous molecule, if one exists
+
+Functions: 
+    generateverts: Generate all vertices of the cone in 2D and 3D. Generates
+        vertices along the start edge if it does not exist, and always 
+        generates vertices along the end edge.
+    generateedges: Generate all edges by connecting vertices and assign fold 
+        directions.
+    generatefaces: Generate all faces based on vertices for that face and the
+        full list of edges in the cone
+"""
 class Cone(Molecule):
     def __init__(self, ngores, gorewidth, cwrot, 
                  startradius, startheight2d, startheight3d, startverts, startedges,

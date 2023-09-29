@@ -1,53 +1,43 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Jan  3 16:51:09 2023
+'''
+Welcome to OriVase 0.1
+Rebecca Gieseking, 2023
 
-@author: gieseking
-"""
+Main script
+See instructions for use in README.md
+'''
 
 import utils.readinp as readinp
 from datetime import datetime
+import sys
 
 t = []
 t.append(datetime.now())
-# Set up file names
-basefile = 'examples/vase3'
-if '.' in basefile:
-    basefile = basefile[:basefile.index('.')]
-inpfile = basefile+'.txt'
 
-# Read the input
+# Program requires a text input file (details in README.md)
+# Get input file name
+if len(sys.argv) <= 1:
+    inpfile = input("Enter the OriVase input file name: ")
+else:
+    inpfile = sys.argv[1]
+
+if '.' in inpfile:
+    basefile = inpfile[:inpfile.rfind('.')]
+else:
+    basefile = inpfile
+
+# Read the input from the file and convert into blocks of information
 blocks = readinp.readfile(inpfile)
 t.append(datetime.now())
 print("Input read, time = ", t[-1] - t[-2])
 
-# Generate the model
+# Generate the model using the blocks from the input file
+# Construct the 2D and 3D location of points and lines
 shape = readinp.generatemodel(blocks)
 t.append(datetime.now())
 print("Model generated, time = ", t[-1] - t[-2])
 
-# Plot the output
+# Convert the 2D/3D positions of points and lines into the requested outputs
 readinp.displaymodel(shape, blocks, basefile)
 t.append(datetime.now())
 print("Display done, time = ", t[-1] - t[-2])
 print("Total time = ", t[-1] - t[0])
-"""
-display.vpython3d(shape, edges=True)
-'''
-display.plotly3d(basefile+'_3D.html', shape)
-'''
-
-display.plot2d(shape, verts=False)
-t.append(datetime.now())
-print("2D plot done, time = ", t[-1] - t[-2])
-'''
-display.plot3d(basefile+'_3D.png', shape, verts=False, edges=False, faces=True)
-t.append(datetime.now())
-print("3D plot done, time = ", t[-1] - t[-2])
-'''
-display.write_svg_cp(basefile+'.svg', shape.ngores*shape.gorewidth, 
-                     shape.currentheight2d, shape.edges)
-t.append(datetime.now())
-print("SVG done, time = ", t[-1] - t[-2])
-print("Total time = ", t[-1] - t[0])
-"""

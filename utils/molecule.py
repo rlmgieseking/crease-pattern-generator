@@ -1,14 +1,61 @@
 # -*- coding: utf-8 -*-
-"""
-General Molecule class
-Molecules are collections of elements for a segment of the final form
-"""
+
 import math
 import numpy as np
 import utils.elements as el
 from copy import deepcopy
 from scipy.optimize import fsolve
 
+"""
+General Molecule class
+Molecules are collections of elements for a section of the final form. This 
+class is inherited by Cone, DiagShift, etc. Since the main molecules are either
+rotationally symmetric or derived from rotationally symmetric forms, the 
+molecules are defined based on the position and angle of their central axis and
+the radius of the paper relative to that central axis. For molecules like
+DiagShift, the central axis is discontinuous within the molecule.
+
+Attributes:
+    ngores: Number of sides/gores the molecule has (usually the same for all 
+        molecules in a model)
+    gorewidth: Width of the paper for each gore (usually the same for all 
+        molecules in a model)
+    cwrot: Rotational direction of the flanges. Clockwise if True, 
+        counterclockwise if False
+    startradius: Radius of the molecule at its first edge, where it connects to
+        the previous molecule
+    startheight2d: Height of the first edge of this molecule on the unfolded 
+        sheet of paper
+    startheight3d: Height of the first edge of this molecule in 3D space
+    startverts: Vertices that connect this molecule to the previous one
+    nstartverts: Number of vertices in startverts
+    startedges: Edges that connect this molecule to the previous one
+    incomingangle: Angle in 3D relative to z (vertical) of the faces in the
+        previous molecule. Used to determine the mountain/valley assignment of 
+        the connecting edge.
+    xyrot: Incoming angle of the first edge of the paper, in the xy plane. 
+    axis: If the previous molecule has its central axis tilted from zero, 
+        indicates the current tilt angle relative to vertical
+    center: 3D position of the central axis at the start edge of the molecule
+    startedgetype: 'auto' to compute whether the edge joining this molecule to
+        the previous one is mountain, valley, or rule line. 'none' for rule 
+        line regardless of the angle between faces.
+        
+Functions:
+    rotate_xy: Rotate the 3D position of the entire molecule to align the
+        edge of the paper with xyrot
+    rotate_axis: Rotate the 3D position of the entire molecule to align its 
+        axis with the given incoming axis. Should be used after rotate_xy.
+    translate3d: Translate the entire molecule in 3D to align with the incoming
+        central axis
+    heights: Used by generatehalftwist to find the vertical positions of the
+        outer vertices and the convergence point
+    loc3d: Used by generatehalftwist to find the positions of the outer 
+        vertices surrounding the convergence point
+    generatehalftwist: Generates a half-twist, bringing the paper from a set of 
+        outer vertices to one convergence point. A diagonal shift is a set of 
+        two stacked half-twists.
+"""
 class Molecule:
     def __init__(self, ngores, gorewidth, cwrot, 
                  startradius, startheight2d, startheight3d, startverts, startedges,
@@ -25,7 +72,7 @@ class Molecule:
         else: 
             self.nstartverts = 0
         self.startedges = startedges
-        if startverts:
+        if startedges:
             self.nstartedges = len(startedges)
         else: 
             self.nstartedges = 0

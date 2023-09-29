@@ -1,15 +1,34 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Wed Jan  4 14:34:02 2023
 
-@author: gieseking
-"""
 
 import math
 from utils.cone import Cone
 from utils.diagshift import DiagonalShift
 
-# Contains master list of all elements for the full model
+"""
+Model class
+Contains the master list of all elements and molecules for the full model
+
+Attributes:
+    ngores
+    gorewidth
+    cwrot
+    currentradius
+    relativedim
+    maxradius
+    currentheight2d
+    currentheight3d
+    currentcenter
+    currentaxis
+    currentangle
+    xyrot
+    verts
+    edges
+    faces
+    molecules
+
+"""
+
 class Model:
     def __init__(self, ngores=8, gorewidth=1.0, cwrot=False, currentradius=0.0, relativedim=True):
         self.ngores = ngores

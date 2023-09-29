@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Jan  4 08:49:19 2023
 Elements are the basic components of folded models:
     Vertex
     Edge
-    Face (to be implemented)
+    Face 
 Each has its 2D and 3D positional information
-
-@author: gieseking
 """
 
 import math
@@ -15,12 +12,20 @@ import numpy as np
 
 """
 Vertex attributes:
-    2D position (x, y) 
-    3D position (x, y, z)
+    2D position (x,y) 
+    3D position (x,y,z)
+    3D position for visualization (x,y,z) (This could be the same as the actual
+                3D position, but a tiny offset for some points makes the 3D
+                visualization from vpython look generally cleaner)
     
 Functions:
     check_valid_position_format: Make sure the 2D and 3D positions have
         the correct number of values and that all values are numbers
+    translate2d: Move the 2D position of the vertex by the indicated distance
+    translate3d: Move the 3D position of the vertex (and the 3D position for
+        visualization) by the indicated distance
+    rotate: Rotate the vertex clockwise around the indicated axis (x, y, or z) 
+        by the given angle 
 """
 class Vertex:
     def __init__(self, pos2d, pos3d, pos3dvis = None):
@@ -74,13 +79,15 @@ class Vertex:
     
 """
 Edge attributes:
-    Endpoints (2 Vertex objects)
-    Direction ('B', 'M', 'V', '0' for border, mountain, valley, or placeholder with no line)
+    Endpoints end1 & end2 (2 Vertex objects)
+    Direction ('B', 'M', 'V', 'U' for border, mountain, valley, or undefined.
+               'U' is generally used for rule lines that are not intended to
+               be folded as creases.)
 
 Functions:
-    check_valid_endpoint_format: Make sure the 2D and 3D positions have
-        the correct number of values and that all values are numbers
-    check_valid_distance: Make sure the 2D and 3D distances between endpoints are the same
+    check_valid_endpoint_format: Make sure both end points are Vertex objects
+    check_valid_distance: Make sure the 2D and 3D distances between endpoints 
+        are the same within a small error margin
     check_valid_direction: Make sure the direction is valid
 """
 class Edge:
@@ -91,6 +98,7 @@ class Edge:
         
         self.check_valid_endpoint_format()
         self.check_valid_distance()
+        self.check_valid_direction()
         
     def check_valid_endpoint_format(self):
         end1_valid = isinstance(self.end1, Vertex)
@@ -107,18 +115,36 @@ class Edge:
         if ((dist2d > dist3d * (1.0 + allowed_error) or dist2d < dist3d / (1.0 + allowed_error)) and
              abs(dist2d - dist3d) > allowed_error/100):
             print("Error: 2D distance and 3D distances have a significant difference")
-            print("2D distance", dist2d, self.end1.pos2d, self.end2.pos2d)
-            print("3D distance", dist3d, self.end1.pos3d, self.end2.pos3d)
-            pass
+            print("  2D distance", dist2d, 'between points', self.end1.pos2d, 
+                  'and', self.end2.pos2d)
+            print("  3D distance", dist3d, 'between points', self.end1.pos3d, 
+                  'and', self.end2.pos3d)
         else:
             #print("Distances valid")
             pass
+        
+    def check_valid_direction(self):
+        if self.direction not in ['B','M','V','U']:
+            print("Error: Edge has an invalid direction of ", self.direction, 
+                  " Edge direction should be B, M, V, or U")
     
 """
 Face attributes:
-    List of corners (at least 3 Vertex objects)
-    List of edges   (at least 3 Edge   objects; must be same length as vertices)
-    Color (to be used later)
+    List of vertices (at least 3 Vertex objects)
+    List of edges    (at least 3 Edge objects; must be same length as vertices)
+    Color 
+    
+Functions:
+    getEdges: A face can be defined using a list of vertices defining the face,
+        plus a list of all edges in the model or molecule (edgelist). If so, 
+        this function finds the correct edges from edgelist and constructs the
+        list of edges that define this face.
+    getVerts: A face can be defined using a list of edges. If so, this function
+        generates the list of vertices that define this face.
+    checkValid: If edges or verts are missing, uses getEdges or getVerts to 
+        construct the missing attribute. Checks that the number of edges and
+        vertices is the same, that there are at least 3 of each, and that the
+        face is planar within a small margin of error.
 """
 class Face:
     def __init__(self, verts = [], edges = [], edgelist=[], color=(0.8, 0.8, 0.8)):

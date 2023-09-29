@@ -3,10 +3,14 @@ Author: Rebecca Gieseking
 
 Orivase is a Python 3 script that generates crease patterns and 3D visualizations for origami vase forms. As of Version 0.1, the script can create forms based on cones (similar to the capabilities of the ORI-REVO package) and diagonal shifts.
 
-## Setup and Installation
+## Setup and installation
+
+## Running the script
+
+As of version 0.1, the script requires a text-based input file (described below). 
 
 ## Input file format
-The script reads a text-based input file and uses the information in that file to generate the output. The input format is fairly flexible about spacing, capitalization, number of lines, etc. Several example input files are included in the `examples` directory
+The script reads a text-based input file and uses the information in that file to generate the output. The input format is fairly flexible about spacing, capitalization, number of lines, etc. Several example input files are included in the `examples` directory.
 
 ### Comments
 Comments start with the symbol #. Any text from the # to the end of the line will be treated as a comment and discarded when the script reads the input file. The # may appear at the beginning or middle of any line.

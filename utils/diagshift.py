@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-DiagonalShift class
-"""
 
 from utils.molecule import Molecule
 import math
@@ -9,8 +6,31 @@ import utils.elements as el
 import numpy as np
 from copy import deepcopy
 
-# tiltangle = angle from horizontal
-# tiltrot = angle in the xy plane where the tilt plane is at the start height
+"""
+DiagonalShift class
+Inherits from Molecule
+
+New attributes:
+    endradius: Radius of the cone at its final edge
+    offsetfract: Offset of the convergence point from the central axis, as a
+        fraction of the radius 
+    tiltrot: Rotation of the tilted plane of the shift in the xy plane. 
+        Indicates the angle where the tilt plane touches the start edge.
+    endheight3d: Height at the end edge in 3D
+    angle: Angle of the faces of the cone relative to its central axis
+    anglediff: Difference in angle between the faces of this cone and the faces
+        of the previous molecule, if one exists
+
+Functions: 
+    generateverts: Generate all vertices of the shift in 2D and 3D. Generates
+        vertices along the start edge if it does not exist, and always 
+        generates vertices along the end edge.
+    generateedges: Generate all edges by connecting vertices and assign fold 
+        directions.
+    generatefaces: Generate all faces based on vertices for that face and the
+        full list of edges.
+"""
+
 class DiagonalShift(Molecule):
     def __init__(self, ngores, gorewidth, cwrot, 
                  startradius, startheight2d, startheight3d, startverts, startedges,
