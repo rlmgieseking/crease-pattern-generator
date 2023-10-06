@@ -59,7 +59,7 @@ Functions:
 class Molecule:
     def __init__(self, ngores, gorewidth, cwrot, 
                  startradius, startheight2d, startheight3d, startverts, startedges,
-                 incomingangle, xyrot, axis, center, startedgetype):
+                 incomingangle, xyrot, axis, center, startedgetype, overlap):
         self.ngores = ngores
         self.gorewidth = gorewidth
         self.cwrot = cwrot
@@ -85,6 +85,7 @@ class Molecule:
         self.verts = []
         self.edges = []
         self.faces = []
+        self.overlap = overlap
         return
 
     # Rotate all vertices in the xy plane
@@ -156,7 +157,7 @@ class Molecule:
         target = math.sqrt(dist3d**2 - dx2d**2)
             
         # Compute error in paper lengths for subsequent inner vertices
-        for i in range(1,self.ngores):
+        for i in range(1, (self.ngores + self.overlap)):
             dist3d = math.sqrt((verts[i*2+1].pos3d[0,0] - conv[0])**2 +
                                (verts[i*2+1].pos3d[0,1] - conv[1])**2 +
                                (h[i] - h[0])**2)
@@ -208,9 +209,9 @@ class Molecule:
         #print('height', minheight2d, minheight3d)
         # Solve heights function to get the actual heights of the points
         if toptwist:
-            init = np.array([0.01] + [0] * (self.ngores - 1))
+            init = np.array([0.05] + [0] * ((self.ngores + self.overlap) - 1))
         else:
-            init = np.array([-0.01] + [0] * (self.ngores - 1))
+            init = np.array([-0.05] + [0] * ((self.ngores + self.overlap) - 1))
         # For relatively small offsets, solve directly
         # For larger offsets, solve for a smaller offset, then scale up
         if offsetfract < 0.3:
@@ -252,7 +253,7 @@ class Molecule:
         
         # Add new points for transition from cylinder to shift
         # Outer vertices get placeholder heights, corrected in next step
-        for i in range(self.ngores*2+1):
+        for i in range((self.ngores + self.overlap)*2+1):
             verts.append(deepcopy(verts[i]))
             if i % 2 == 1:
                 verts[-1].pos3d[0,2] = - minz + zpos[(i-1)//2] + minheight3d
@@ -265,15 +266,15 @@ class Molecule:
             else:
                 if self.cwrot:
                     if i == 0:
-                        h = - minz + zpos[i//2] + dfrac * (zpos[i//2] - zpos[-1])
-                    elif i == self.ngores*2:
+                        h = - minz + zpos[i//2] + dfrac * (zpos[i//2] - zpos[self.ngores-1])
+                    elif i == (self.ngores + self.overlap)*2:
                         h = - minz + zpos[0] + dfrac * (zpos[0] - zpos[(i-2)//2])
                     else:
                         h = - minz + zpos[i//2] + dfrac * (zpos[(i)//2] - zpos[(i-2)//2])
                 else:
                     if i == 0:
-                        h = - minz + zpos[-1] - dfrac * (zpos[i//2] - zpos[-1])
-                    elif i == self.ngores*2:
+                        h = - minz + zpos[self.ngores-1] - dfrac * (zpos[i//2] - zpos[self.ngores-1])
+                    elif i == (self.ngores + self.overlap)*2:
                         h = - minz + zpos[(i-2)//2] - dfrac * (zpos[0] - zpos[(i-2)//2])
                     else:
                         h = - minz + zpos[(i-2)//2] - dfrac * (zpos[(i)//2] - zpos[(i-2)//2])
@@ -284,23 +285,32 @@ class Molecule:
         # If the new lowest vertex is below 0, correct all the vertices
         #print(newmin, minheight3d)
         if newmin != 0:
-            for i in range(self.ngores*2+1):
-                verts[i + self.ngores*2+1].pos3d[0,2] -= newmin - minheight3d
-                verts[i + self.ngores*2+1].pos3dvis[0,2] -= newmin - minheight3d
-                verts[i + self.ngores*2+1].pos2d[0,1] -= newmin - minheight3d
+            for i in range((self.ngores + self.overlap)*2+1):
+                verts[i + (self.ngores + self.overlap)*2+1].pos3d[0,2] -= newmin - minheight3d
+                verts[i + (self.ngores + self.overlap)*2+1].pos3dvis[0,2] -= newmin - minheight3d
+                verts[i + (self.ngores + self.overlap)*2+1].pos2d[0,1] -= newmin - minheight3d
             conv2d -= newmin - minheight3d
             conv3d[0,2] -= newmin - minheight3d
         #print('conv3d',conv3d)
         # Add vertices surrounding convergence point 
         # Inner vertices get exact positions
         # Outer vertices get placeholder 3D positions to be fixed in the next step
-        for i in range(0, self.ngores * 2 + 1, 2):
-            i1 = i + self.ngores*2     if i > 0 else self.ngores*4
-            i3 = i + self.ngores*2 + 2 if i < self.ngores*2 else self.ngores*2 + 2
+        for i in range(0, (self.ngores + self.overlap) * 2 + 1, 2):
+            if i > 0:
+                i1 = i + (self.ngores + self.overlap)*2
+            else:
+                i1 = (self.ngores + self.overlap)*2 + self.ngores*2
+            if i < (self.ngores + self.overlap)*2:
+                i3 = i + (self.ngores + self.overlap)*2 + 2
+            else:
+                i3 = (self.ngores + self.overlap)*2 + 2 + self.overlap*2
+            #i1 = i + (self.ngores + self.overlap)*2     if i > 0 else (self.ngores + self.overlap)*4
+            #i3 = i + (self.ngores + self.overlap)*2 + 2 if i < (self.ngores + self.overlap)*2 else (self.ngores + self.overlap)*2 + 2
             x13 = verts[i1].pos3d[0,0] - verts[i3].pos3d[0,0]
             y13 = verts[i1].pos3d[0,1] - verts[i3].pos3d[0,1]
             z13 = verts[i1].pos3d[0,2] - verts[i3].pos3d[0,2]
             d13 = math.sqrt(x13**2 + y13**2 + z13**2)
+            #print(i,i1,i3, d13)
             if self.cwrot:
                 xd = -(self.gorewidth/2) * x13 / d13
                 yd = -(self.gorewidth/2) * y13 / d13
@@ -317,11 +327,20 @@ class Molecule:
         
         # Fix positions of outer vertices surrounding the convergence point
         vertind = [0,0,0]
-        for i in range(self.ngores+1):
-            vertind[0] = i*2 + self.ngores*2 + 1
-            vertind[1] = i*2 + self.ngores*4 + 3 if i < self.ngores else i*2 + self.ngores*4 + 1
-            vertind[2] = vertind[0] + 2 if i < self.ngores else vertind[0] + 2 - self.ngores*2
-            v = i*2 + self.ngores*4 + 2
+        for i in range((self.ngores + self.overlap)+1):
+            vertind[0] = i*2 + (self.ngores + self.overlap)*2 + 1
+            if i < (self.ngores + self.overlap):
+                vertind[1] = i*2 + (self.ngores + self.overlap)*4 + 3
+                vertind[2] = vertind[0] + 2
+            else:
+                vertind[1] = i*2 + (self.ngores + self.overlap)*4 + 1
+                vertind[2] = vertind[0] + 2 - (self.ngores + self.overlap)*2
+                
+            #vertind[1] = i*2 + (self.ngores + self.overlap)*4 + 3 if i < (self.ngores + self.overlap) else i*2 + (self.ngores + self.overlap)*4 + 1
+            #vertind[2] = vertind[0] + 2 if i < (self.ngores + self.overlap) else vertind[0] + 2 - (self.ngores + self.overlap)*2
+            
+            v = i*2 + (self.ngores + self.overlap)*4 + 2
+            print(v, vertind)
             #print('vertind', i, v, vertind)
             dx = abs(verts[vertind[1]].pos2d[0,0] - verts[v].pos2d[0,0])
             dy = abs(verts[vertind[0]].pos2d[0,1] - verts[v].pos2d[0,1])

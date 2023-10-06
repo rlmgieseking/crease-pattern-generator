@@ -9,40 +9,42 @@ import utils.model as model
 import utils.display as display
 
 # Define variables available for each block and their default values
-setupvars = [['ngores',    int,   8], 
-             ['gorewidth', float, 1.0], 
-             ['radius',    float, 0.0], 
-             ['cwrot',     bool,  False]]
-conevars =  [['height',    float, 0.0],
-             ['radius',    float, 0.0],
-             ['startedge', str,   'auto']]
-curvedconevars = [['height',    float, 0.0],
-                  ['radius',    float, 0.0],
-                  ['startedge', str,   'auto'],
-                  ['vertexheight',    float, 0.0],
-                  ['vertexradius',    float, 0.0],
-                  ['nsegments',       int,   4]]
-diagshiftvars =  [['radius',      float, 0.0],
-                  ['offsetfract', float, 0.0],
-                  ['tiltrot',     float, 0.0],
-                  ['startedge',   str,   'auto']]
-displayvars = [['svgcp',         bool, True],
-               ['svgcp_verts',   bool, False],
-               ['svgcp_edges',   bool, True],
-               ['svgcp_rules',   bool, True],
-               ['vpy',           bool, True],
-               ['vpy_verts',     bool, False],
-               ['vpy_edges',     bool, True],
-               ['vpy_faces',     bool, True],
-               ['vpy_image',     bool, True],
-               ['fold2d',         bool, True],
-               ['fold2d_verts',   bool, True],
-               ['fold2d_edges',   bool, True],
-               ['fold2d_faces',   bool, True],
-               ['fold3d',         bool, True],
-               ['fold3d_verts',   bool, True],
-               ['fold3d_edges',   bool, True],
-               ['fold3d_faces',   bool, True],]
+setupvars =      [['ngores',         int,   8], 
+                  ['gorewidth',      float, 1.0], 
+                  ['radius',         float, 0.0], 
+                  ['cwrot',          bool,  False],
+                  ['overlap',        int,   0],
+                  ['relativedim',    bool,  True]]
+conevars =       [['height',         float, 0.0],
+                  ['radius',         float, 0.0],
+                  ['startedge',      str,   'auto']]
+curvedconevars = [['height',         float, 0.0],
+                  ['radius',         float, 0.0],
+                  ['startedge',      str,   'auto'],
+                  ['vertexheight',   float, 0.0],
+                  ['vertexradius',   float, 0.0],
+                  ['nsegments',      int,   4]]
+diagshiftvars =  [['radius',         float, 0.0],
+                  ['offsetfract',    float, 0.0],
+                  ['tiltrot',        float, 0.0],
+                  ['startedge',      str,   'auto']]
+displayvars =    [['svgcp',          bool,  True],
+                  ['svgcp_verts',    bool,  False],
+                  ['svgcp_edges',    bool,  True],
+                  ['svgcp_rules',    bool,  True],
+                  ['vpy',            bool,  True],
+                  ['vpy_verts',      bool,  False],
+                  ['vpy_edges',      bool,  True],
+                  ['vpy_faces',      bool,  True],
+                  ['vpy_image',      bool,  True],
+                  ['fold2d',         bool,  True],
+                  ['fold2d_verts',   bool,  True],
+                  ['fold2d_edges',   bool,  True],
+                  ['fold2d_faces',   bool,  True],
+                  ['fold3d',         bool,  True],
+                  ['fold3d_verts',   bool,  True],
+                  ['fold3d_edges',   bool,  True],
+                  ['fold3d_faces',   bool,  True],]
 
 def getvar(block, varname, vartype, vardefault):
     var = None
@@ -114,7 +116,12 @@ def generatemodel(blocks):
                 #print(ngores)
                 if len(block) > 0:
                     print('Error: Variables', block, 'could not be interpreted. Ignoring these values.')
-                shape = model.Model(ngores, gorewidth, cwrot, radius)
+                shape = model.Model(ngores=ngores, 
+                                    gorewidth=gorewidth, 
+                                    cwrot=cwrot, 
+                                    currentradius=radius, 
+                                    relativedim=relativedim,
+                                    overlap=overlap)
                 modelexists = True
         elif 'add' in block:
             block.remove('add')
@@ -124,7 +131,12 @@ def generatemodel(blocks):
                     #print(varname, vartype)
                     block, var = getvar([], varname, vartype, vardefault)
                     exec("%s = %r" % (varname, var), globals())
-                shape = model.Model(ngores, gorewidth, cwrot, radius)
+                shape = model.Model(ngores=ngores, 
+                                    gorewidth=gorewidth, 
+                                    cwrot=cwrot, 
+                                    currentradius=radius, 
+                                    relativedim=relativedim,
+                                    overlap=overlap)
                 modelexists = True
             if 'cone' in block:
                 block.remove('cone')

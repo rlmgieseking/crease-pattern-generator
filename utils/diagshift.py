@@ -34,11 +34,23 @@ Functions:
 class DiagonalShift(Molecule):
     def __init__(self, ngores, gorewidth, cwrot, 
                  startradius, startheight2d, startheight3d, startverts, startedges,
-                 incomingangle, xyrot, axis, center, startedgetype, 
+                 incomingangle, xyrot, axis, center, startedgetype, overlap,
                  endradius, offsetfract, tiltrot):
-        Molecule.__init__(self, ngores, gorewidth, cwrot, 
-                          startradius, startheight2d, startheight3d, startverts, startedges,
-                          incomingangle, xyrot, axis, center, startedgetype)
+        Molecule.__init__(self, 
+                          ngores = ngores, 
+                          gorewidth = gorewidth, 
+                          cwrot = cwrot, 
+                          startradius = startradius, 
+                          startheight2d = startheight2d, 
+                          startheight3d = startheight3d, 
+                          startverts = startverts, 
+                          startedges = startedges,
+                          incomingangle = incomingangle, 
+                          xyrot = xyrot, 
+                          axis = axis, 
+                          center = center, 
+                          startedgetype = startedgetype,
+                          overlap = overlap)
 
         self.endradius = endradius
         self.offsetfract = offsetfract
@@ -62,7 +74,7 @@ class DiagonalShift(Molecule):
         # Generate or load bottom edge points
         ####
         visshift = 0.01
-        if self.startverts and len(self.startverts) == self.ngores * 2 + 1:
+        if self.startverts and len(self.startverts) == (self.ngores + self.overlap) * 2 + 1:
             self.verts = self.startverts
             #print('startverts')
             #for vert in self.startverts:
@@ -102,7 +114,7 @@ class DiagonalShift(Molecule):
             self.verts[-1].rotate(self.xyrot, 'z')
             
             # Replicate verts for each gore, with the correct rotations and translations
-            for i in range(1, self.ngores):
+            for i in range(1, (self.ngores + self.overlap)):
                 self.verts.append(deepcopy(self.verts[-2]))
                 self.verts[-1].translate2d([self.gorewidth, 0.0])
                 self.verts[-1].rotate(math.pi * 2 / self.ngores, 'z')
@@ -162,7 +174,7 @@ class DiagonalShift(Molecule):
         topverts[-2].rotate(self.xyrot, 'z')
         topverts[-1].rotate(self.xyrot, 'z')
         # Replicate verts for each gore, with the correct rotations and translations
-        for i in range(1, self.ngores):
+        for i in range(1, (self.ngores + self.overlap)):
             topverts.append(deepcopy(topverts[-2]))
             topverts[-1].translate2d([self.gorewidth, 0.0])
             topverts[-1].rotate(math.pi * 2 / self.ngores, 'z')
@@ -205,26 +217,30 @@ class DiagonalShift(Molecule):
         # Generate remaining points for top and bottom half
         # Then, combine all points into one set of vertices
         ####
+        print('Start verts', len(self.verts))
         self.verts, conv3d, conv2d = self.generatehalftwist(self.verts, conv3d, 
                                                             self.center, self.offsetfract, 
                                                             toptwist=True)
+        print('Lower verts', len(self.verts))
+        print('End   verts', len(topverts))
         self.cwrot = not self.cwrot
         topverts, conv3dtop, conv2dtop = self.generatehalftwist(topverts, conv3d, 
                                                                 topcenter, self.offsetfract,
                                                                 toptwist=False)
+        print('Upper verts', len(topverts))
         
-        iconv = self.ngores*4 + 3
+        iconv = (self.ngores + self.overlap)*4 + 3
         dz2d = self.verts[iconv].pos2d[0,1] - topverts[iconv].pos2d[0,1]
         dz3d = self.verts[iconv].pos3d[0,2] - topverts[iconv].pos3d[0,2]
         #print('conv2d', conv2d, self.startheight2d)
         #print('conv3d', conv3d, self.startheight3d)
 
-        for i in range(self.ngores*2+1, self.ngores*4+2):
+        for i in range((self.ngores + self.overlap)*2+1, (self.ngores + self.overlap)*4+2):
             self.verts.append(topverts[i])
             self.verts[-1].pos2d[0,1] += dz2d
             self.verts[-1].pos3d[0,2] += dz3d
             self.verts[-1].pos3dvis[0,2] += dz3d
-        for i in range(0, self.ngores*2+1):
+        for i in range(0, (self.ngores + self.overlap)*2+1):
             self.verts.append(topverts[i])
             self.verts[-1].pos2d[0,1] += dz2d - self.startheight2d
             self.verts[-1].pos3d[0,2] += dz3d
@@ -239,7 +255,7 @@ class DiagonalShift(Molecule):
         self.rotate_axis()
         #self.translate3d(z = False)
         # Select end vertices
-        self.endverts = self.verts[-2*self.ngores-1:]
+        self.endverts = self.verts[-2*(self.ngores + self.overlap)-1:]
         #print('endverts')
         #for vert in self.endverts:
         #    print(vert.pos2d, vert.pos3d)
@@ -251,15 +267,15 @@ class DiagonalShift(Molecule):
 
         
     def generateedges(self):
-        if self.startedges and len(self.startedges) == self.ngores * 2:
+        if self.startedges and len(self.startedges) == (self.ngores + self.overlap) * 2:
             self.edges = self.startedges
         else:
             # Generate start edges
-            for i in range(0, self.ngores*2, 2):
+            for i in range(0, (self.ngores + self.overlap)*2, 2):
                 self.edges.append(el.Edge(self.verts[i],                     self.verts[i+1], 'B'))
                 self.edges.append(el.Edge(self.verts[i+1],                   self.verts[i+2], 'B'))
         # Correct directions of start edges
-        for i in range(0, self.ngores*2, 2):
+        for i in range(0, (self.ngores + self.overlap)*2, 2):
             if self.anglediff == None:
                 pass
             elif abs(self.anglediff) < 0.01 or self.startedgetype == 'none':
@@ -272,14 +288,20 @@ class DiagonalShift(Molecule):
                 self.edges[i].direction   = 'M'
                 self.edges[i+1].direction = 'V'
         # Connect start cylinder to start shift
-        for i in range(0, self.ngores*2, 2):
-            self.edges.append(el.Edge(self.verts[i],   self.verts[i+1  + self.ngores*2], 'V'))
+        for i in range(0, (self.ngores + self.overlap)*2, 2):
+            self.edges.append(el.Edge(self.verts[i],   
+                                      self.verts[i+1  + (self.ngores + self.overlap)*2], 
+                                      'V'))
             if i == 0: self.edges[-1].direction = 'B' 
-            self.edges.append(el.Edge(self.verts[i+1], self.verts[i+2  + self.ngores*2], 'M'))
-        self.edges.append(el.Edge(self.verts[self.ngores*2], self.verts[self.ngores*4+1], 'B'))
+            self.edges.append(el.Edge(self.verts[i+1], 
+                                      self.verts[i+2  + (self.ngores + self.overlap)*2], 
+                                      'M'))
+        self.edges.append(el.Edge(self.verts[(self.ngores + self.overlap)*2], 
+                                  self.verts[(self.ngores + self.overlap)*4+1], 
+                                  'B'))
         
         # Connect start shift
-        for i in range(self.ngores*2+1, self.ngores*4+1, 2):
+        for i in range((self.ngores + self.overlap)*2+1, (self.ngores + self.overlap)*4+1, 2):
             if self.cwrot:
                 self.edges.append(el.Edge(self.verts[i]  , self.verts[i+1], 'V'))
                 self.edges.append(el.Edge(self.verts[i+1], self.verts[i+2], 'M'))
@@ -288,22 +310,34 @@ class DiagonalShift(Molecule):
                 self.edges.append(el.Edge(self.verts[i+1], self.verts[i+2], 'V'))
         
         # Connect start shift to middle shift
-        for i in range(self.ngores*2+1, self.ngores*4+1, 2):
-            self.edges.append(el.Edge(self.verts[i],   self.verts[i+1  + self.ngores*2], 'V'))
-            if i == self.ngores*2+1: self.edges[-1].direction = 'B' 
-            self.edges.append(el.Edge(self.verts[i+1], self.verts[i+2  + self.ngores*2], 'M'))
-        self.edges.append(el.Edge(self.verts[self.ngores*4+1], self.verts[self.ngores*6+2], 'B'))
+        for i in range((self.ngores + self.overlap)*2+1, (self.ngores + self.overlap)*4+1, 2):
+            self.edges.append(el.Edge(self.verts[i],   
+                                      self.verts[i+1  + (self.ngores + self.overlap)*2], 
+                                      'V'))
+            if i == (self.ngores + self.overlap)*2+1: self.edges[-1].direction = 'B' 
+            self.edges.append(el.Edge(self.verts[i+1], 
+                                      self.verts[i+2  + (self.ngores + self.overlap)*2], 
+                                      'M'))
+        self.edges.append(el.Edge(self.verts[(self.ngores + self.overlap)*4+1], 
+                                  self.verts[(self.ngores + self.overlap)*6+2], 
+                                  'B'))
 
         
         # Connect middle shift to end shift
-        for i in range(self.ngores*4+2, self.ngores*6+2, 2):
-            self.edges.append(el.Edge(self.verts[i],   self.verts[i+1  + self.ngores*2], 'V'))
-            if i == self.ngores*4+2: self.edges[-1].direction = 'B' 
-            self.edges.append(el.Edge(self.verts[i+1], self.verts[i+2  + self.ngores*2], 'M'))
-        self.edges.append(el.Edge(self.verts[self.ngores*6+2], self.verts[self.ngores*8+3], 'B'))
+        for i in range((self.ngores + self.overlap)*4+2, (self.ngores + self.overlap)*6+2, 2):
+            self.edges.append(el.Edge(self.verts[i],   
+                                      self.verts[i+1  + (self.ngores + self.overlap)*2], 
+                                      'V'))
+            if i == (self.ngores + self.overlap)*4+2: self.edges[-1].direction = 'B' 
+            self.edges.append(el.Edge(self.verts[i+1], 
+                                      self.verts[i+2  + (self.ngores + self.overlap)*2], 
+                                      'M'))
+        self.edges.append(el.Edge(self.verts[(self.ngores + self.overlap)*6+2], 
+                                  self.verts[(self.ngores + self.overlap)*8+3], 
+                                  'B'))
         
         # Connect end shift
-        for i in range(self.ngores*6+3, self.ngores*8+3, 2):
+        for i in range((self.ngores + self.overlap)*6+3, (self.ngores + self.overlap)*8+3, 2):
             if self.cwrot:
                 self.edges.append(el.Edge(self.verts[i]  , self.verts[i+1], 'M'))
                 self.edges.append(el.Edge(self.verts[i+1], self.verts[i+2], 'V'))
@@ -312,50 +346,56 @@ class DiagonalShift(Molecule):
                 self.edges.append(el.Edge(self.verts[i+1], self.verts[i+2], 'M'))
         
         # Connect end shift to end cylinder
-        for i in range(self.ngores*6+3, self.ngores*8+3, 2):
-            self.edges.append(el.Edge(self.verts[i],   self.verts[i+1  + self.ngores*2], 'V'))
-            if i == self.ngores*6+3: self.edges[-1].direction = 'B' 
-            self.edges.append(el.Edge(self.verts[i+1], self.verts[i+2  + self.ngores*2], 'M'))
-        self.edges.append(el.Edge(self.verts[self.ngores*8+3], self.verts[self.ngores*10+4], 'B'))
+        for i in range((self.ngores + self.overlap)*6+3, (self.ngores + self.overlap)*8+3, 2):
+            self.edges.append(el.Edge(self.verts[i],   
+                                      self.verts[i+1  + (self.ngores + self.overlap)*2], 
+                                      'V'))
+            if i == (self.ngores + self.overlap)*6+3: self.edges[-1].direction = 'B' 
+            self.edges.append(el.Edge(self.verts[i+1], 
+                                      self.verts[i+2  + (self.ngores + self.overlap)*2], 
+                                      'M'))
+        self.edges.append(el.Edge(self.verts[(self.ngores + self.overlap)*8+3], 
+                                  self.verts[(self.ngores + self.overlap)*10+4], 
+                                  'B'))
        
         # Connect end cylinder
-        for i in range(self.ngores*8+4, self.ngores*10+4, 2):
+        for i in range((self.ngores + self.overlap)*8+4, (self.ngores + self.overlap)*10+4, 2):
             self.edges.append(el.Edge(self.verts[i]  , self.verts[i+1], 'B'))
             self.edges.append(el.Edge(self.verts[i+1], self.verts[i+2], 'B'))
         
-        self.endedges = self.edges[-self.ngores*2:]
+        self.endedges = self.edges[-(self.ngores + self.overlap)*2:]
         #print('edges', len(self.endedges))
         
         
     def generatefaces(self):
         # Add faces
-        for i in range(self.ngores*2):
+        for i in range((self.ngores + self.overlap)*2):
             self.faces.append(el.Face(verts=[self.verts[i], 
-                                             self.verts[i + self.ngores*2 + 1],
-                                             self.verts[i + self.ngores*2 + 2],
+                                             self.verts[i + (self.ngores + self.overlap)*2 + 1],
+                                             self.verts[i + (self.ngores + self.overlap)*2 + 2],
                                              self.verts[i+1]],
                                       edgelist = self.edges))
-        for i in range(self.ngores*2):
-            istart = i + self.ngores*2 + 1
+        for i in range((self.ngores + self.overlap)*2):
+            istart = i + (self.ngores + self.overlap)*2 + 1
             self.faces.append(el.Face(verts=[self.verts[istart],
-                                             self.verts[istart + self.ngores*2 + 1],
-                                             self.verts[istart + self.ngores*2 + 2],
+                                             self.verts[istart + (self.ngores + self.overlap)*2 + 1],
+                                             self.verts[istart + (self.ngores + self.overlap)*2 + 2],
                                              self.verts[istart + 1]],
                                       edgelist = self.edges))
         
-        for i in range(self.ngores*2):
-            istart = i + self.ngores*4 + 2
+        for i in range((self.ngores + self.overlap)*2):
+            istart = i + (self.ngores + self.overlap)*4 + 2
             self.faces.append(el.Face(verts=[self.verts[istart],
-                                             self.verts[istart + self.ngores*2 + 1],
-                                             self.verts[istart + self.ngores*2 + 2],
+                                             self.verts[istart + (self.ngores + self.overlap)*2 + 1],
+                                             self.verts[istart + (self.ngores + self.overlap)*2 + 2],
                                              self.verts[istart + 1]],
                                       edgelist = self.edges))
         
-        for i in range(self.ngores*2):
-            istart = i + self.ngores*6 + 3
+        for i in range((self.ngores + self.overlap)*2):
+            istart = i + (self.ngores + self.overlap)*6 + 3
             self.faces.append(el.Face(verts=[self.verts[istart],
-                                             self.verts[istart + self.ngores*2 + 1],
-                                             self.verts[istart + self.ngores*2 + 2],
+                                             self.verts[istart + (self.ngores + self.overlap)*2 + 1],
+                                             self.verts[istart + (self.ngores + self.overlap)*2 + 2],
                                              self.verts[istart + 1]],
                                       edgelist = self.edges))
         

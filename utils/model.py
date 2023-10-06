@@ -30,12 +30,14 @@ Attributes:
 """
 
 class Model:
-    def __init__(self, ngores=8, gorewidth=1.0, cwrot=False, currentradius=0.0, relativedim=True):
+    def __init__(self, ngores=8, gorewidth=1.0, cwrot=False, 
+                 currentradius=0.0, relativedim=True, overlap=0):
         self.ngores = ngores
         self.gorewidth = gorewidth
         self.relativedim = relativedim
         # Define maximum radius for a polygon of ngores sides of length gorewidth
         self.maxradius = gorewidth / 2 / math.tan(math.pi/ngores)
+        self.overlap = overlap
         
         # Direction of flanges from top view. From side view, cw = left, ccw = right
         self.cwrot = cwrot
@@ -49,9 +51,10 @@ class Model:
         else:
             self.currentradius = currentradius
             if abs(self.currentradius) > self.maxradius:
-                print("Error: Radius cannot exceed the maximum possible radius of ", str(self.maxradius))
-                print("Radius of ", str(currentradius), " is impossible for ", str(ngores),
-                      " sides of width", str(gorewidth))
+                print("Error: Radius cannot exceed the maximum possible radius of ", 
+                      str(self.maxradius))
+                print("Radius of ", str(currentradius), " is impossible for ", 
+                      str(ngores), " sides of width", str(gorewidth))
         self.currentheight2d = 0.0
         self.currentheight3d = 0.0
         self.currentcenter = [0.0, 0.0]
@@ -80,11 +83,22 @@ class Model:
             startverts, startedges = self.molecules[-1].endverts, self.molecules[-1].endedges
         else:
             startverts, startedges = None, None
-        self.molecules.append(Cone(self.ngores, self.gorewidth, self.cwrot, 
-                                   self.currentradius, self.currentheight2d, self.currentheight3d, 
-                                   startverts, startedges,
-                                   self.currentangle, self.xyrot, self.currentaxis, self.currentcenter,
-                                   startedgetype, endradius, diffheight3d))
+        self.molecules.append(Cone(ngores = self.ngores, 
+                                   gorewidth = self.gorewidth, 
+                                   cwrot = self.cwrot, 
+                                   startradius = self.currentradius, 
+                                   startheight2d = self.currentheight2d, 
+                                   startheight3d = self.currentheight3d, 
+                                   startverts = startverts, 
+                                   startedges = startedges,
+                                   incomingangle = self.currentangle, 
+                                   xyrot = self.xyrot, 
+                                   axis = self.currentaxis, 
+                                   center = self.currentcenter,
+                                   startedgetype = startedgetype, 
+                                   overlap = self.overlap,
+                                   endradius = endradius, 
+                                   diffheight3d = diffheight3d))
         
         # Update current radius and height to match the end of the cone
         self.currentradius = endradius
@@ -93,7 +107,9 @@ class Model:
             self.currentheight3d += diffheight3d
         else:
             phi = math.atan2(self.currentaxis[1], self.currentaxis[0])
-            theta = math.acos(self.currentaxis[2]/math.sqrt(self.currentaxis[0]**2 + self.currentaxis[1]**2 + self.currentaxis[2]**2))
+            theta = math.acos(self.currentaxis[2]/math.sqrt(self.currentaxis[0]**2 
+                                                            + self.currentaxis[1]**2 
+                                                            + self.currentaxis[2]**2))
             self.currentheight3d  += diffheight3d * math.cos(theta)
             self.currentcenter[0] += diffheight3d * math.sin(theta) * math.cos(phi)
             self.currentcenter[1] -= diffheight3d * math.sin(theta) * math.sin(phi)
@@ -174,7 +190,10 @@ class Model:
                 startedge = startedgetype
             else:
                 startedge = 'none'
-            self.add_cone(rotpts[i][0], rotpts[i][1]-rotpts[i-1][1], startedge, scaleradius=False)
+            self.add_cone(rotpts[i][0], 
+                          rotpts[i][1]-rotpts[i-1][1], 
+                          startedge, 
+                          scaleradius=False)
         
     def add_diagshift(self, endradius, offsetfract, tiltrot, startedgetype='auto'):
         if len(self.molecules) > 0:
@@ -183,11 +202,24 @@ class Model:
             startverts, startedges = None, None
         if self.relativedim:
             endradius *= self.maxradius
-        self.molecules.append(DiagonalShift(self.ngores, self.gorewidth, self.cwrot, 
-                                            self.currentradius, self.currentheight2d, self.currentheight3d, 
-                                            startverts, startedges,
-                                            self.currentangle, self.xyrot, self.currentaxis, self.currentcenter,
-                                            startedgetype, endradius, offsetfract, tiltrot))
+
+        self.molecules.append(DiagonalShift(ngores = self.ngores, 
+                                   gorewidth = self.gorewidth, 
+                                   cwrot = self.cwrot, 
+                                   startradius = self.currentradius, 
+                                   startheight2d = self.currentheight2d, 
+                                   startheight3d = self.currentheight3d, 
+                                   startverts = startverts, 
+                                   startedges = startedges,
+                                   incomingangle = self.currentangle, 
+                                   xyrot = self.xyrot, 
+                                   axis = self.currentaxis, 
+                                   center = self.currentcenter,
+                                   startedgetype = startedgetype, 
+                                   overlap = self.overlap,
+                                   endradius = endradius, 
+                                   offsetfract = offsetfract,
+                                   tiltrot = tiltrot))
         # Update current radius and height to match the end of the shift
         
         diffheight3d = self.molecules[-1].verts[-1].pos3d[0,2] - self.currentheight3d
@@ -198,7 +230,9 @@ class Model:
             self.currentheight3d += diffheight3d
         else:
             phi = math.atan2(self.currentaxis[1], self.currentaxis[0])
-            theta = math.acos(self.currentaxis[2]/math.sqrt(self.currentaxis[0]**2 + self.currentaxis[1]**2 + self.currentaxis[2]**2))
+            theta = math.acos(self.currentaxis[2]/math.sqrt(self.currentaxis[0]**2 
+                                                            + self.currentaxis[1]**2 
+                                                            + self.currentaxis[2]**2))
             self.currentheight3d  += diffheight3d * math.cos(theta)
             self.currentcenter[0] -= diffheight3d * math.sin(theta) * math.cos(phi)
             self.currentcenter[1] += diffheight3d * math.sin(theta) * math.sin(phi)
@@ -228,7 +262,9 @@ class Model:
         else:
             diffheight3d = self.molecules[-1].endheight3d - self.currentheight3d
             phi = math.atan2(self.currentaxis[1], self.currentaxis[0])
-            theta = math.acos(self.currentaxis[2]/math.sqrt(self.currentaxis[0]**2 + self.currentaxis[1]**2 + self.currentaxis[2]**2))
+            theta = math.acos(self.currentaxis[2]/math.sqrt(self.currentaxis[0]**2 
+                                                            + self.currentaxis[1]**2 
+                                                            + self.currentaxis[2]**2))
             self.currentheight3d  += diffheight3d * math.cos(theta)
             self.currentcenter[0] -= diffheight3d * math.sin(theta) * math.cos(phi)
             self.currentcenter[1] += diffheight3d * math.sin(theta) * math.sin(phi)
@@ -276,7 +312,8 @@ class Model:
             else:
                 match = self.match_edge(edge)
                 if match == -1:
-                    self.edges.append(el.Edge(self.verts[end1num], self.verts[end2num], edge.direction))
+                    self.edges.append(el.Edge(self.verts[end1num], 
+                                              self.verts[end2num], edge.direction))
                 else: 
                     # Update edge direction to new value
                     self.edges[match].direction = edge.direction

@@ -3,6 +3,7 @@ SETUP
   nGores  =  8 
   gorewidth  2.0
   radius     0.0
+  overlap    1
 end 
 add cone
   height     0.0

@@ -30,11 +30,23 @@ Functions:
 class Cone(Molecule):
     def __init__(self, ngores, gorewidth, cwrot, 
                  startradius, startheight2d, startheight3d, startverts, startedges,
-                 incomingangle, xyrot, axis, center, startedgetype, 
+                 incomingangle, xyrot, axis, center, startedgetype, overlap, 
                  endradius, diffheight3d):
-        Molecule.__init__(self, ngores, gorewidth, cwrot, 
-                          startradius, startheight2d, startheight3d, startverts, startedges,
-                          incomingangle, xyrot, axis, center, startedgetype)
+        Molecule.__init__(self, 
+                          ngores = ngores, 
+                          gorewidth = gorewidth, 
+                          cwrot = cwrot, 
+                          startradius = startradius, 
+                          startheight2d = startheight2d, 
+                          startheight3d = startheight3d, 
+                          startverts = startverts, 
+                          startedges = startedges,
+                          incomingangle = incomingangle, 
+                          xyrot = xyrot, 
+                          axis = axis, 
+                          center = center, 
+                          startedgetype = startedgetype,
+                          overlap = overlap)
 
         #print('Start cone',datetime.now())
         self.endradius = endradius
@@ -64,7 +76,7 @@ class Cone(Molecule):
         # Generate points along the start edge, in order from left to right on page (cw around model)
         # Place first vertex pair in 3D space
         visshift = 0.01
-        if self.startverts and len(self.startverts) == self.ngores * 2 + 1:
+        if self.startverts and len(self.startverts) == (self.ngores + self.overlap) * 2 + 1:
             self.verts = self.startverts
         else:
             # Generate start edge vertices
@@ -72,24 +84,31 @@ class Cone(Molecule):
                 startouter3d = [self.startradius, -self.gorewidth/2, 0]
                 self.verts.append(el.Vertex([0.0, self.startheight2d], startouter3d))
                 self.verts[-1].rotate(-math.pi * 2 / self.ngores, 'z') 
-                startinner3d = [self.startradius, self.startradius * math.tan(math.pi/self.ngores), 0]
-                startinner3dvis = [self.startradius - visshift, self.startradius * math.tan(math.pi/self.ngores), 0]
-                self.verts.append(el.Vertex([self.gorewidth/2 - self.startradius * math.tan(math.pi/self.ngores), 
+                startinner3d = [self.startradius, 
+                                self.startradius * math.tan(math.pi/self.ngores), 0]
+                startinner3dvis = [self.startradius - visshift, 
+                                   self.startradius * math.tan(math.pi/self.ngores), 0]
+                self.verts.append(el.Vertex([self.gorewidth/2 
+                                             - self.startradius * math.tan(math.pi/self.ngores), 
                                              self.startheight2d], 
                                             startinner3d,
                                             startinner3dvis))
             else: 
                 startouter3d = [self.startradius, self.gorewidth/2, 0]
                 self.verts.append(el.Vertex([0.0, self.startheight2d], startouter3d))
-                startinner3d = [self.startradius, -self.startradius * math.tan(math.pi/self.ngores), 0]
-                startinner3dvis = [self.startradius - visshift, -self.startradius * math.tan(math.pi/self.ngores), 0]
+                startinner3d = [self.startradius, 
+                                -self.startradius * math.tan(math.pi/self.ngores), 
+                                0]
+                startinner3dvis = [self.startradius - visshift, 
+                                   -self.startradius * math.tan(math.pi/self.ngores), 
+                                   0]
                 self.verts.append(el.Vertex([self.gorewidth/2 + self.startradius * math.tan(math.pi/self.ngores), 
                                              self.startheight2d], 
                                             startinner3d,
                                             startinner3dvis))
     
             # Replicate verts for each gore, with the correct rotations and translations
-            for i in range(1, self.ngores):
+            for i in range(1, self.ngores + self.overlap):
                 self.verts.append(deepcopy(self.verts[-2]))
                 self.verts[-1].translate2d([self.gorewidth, 0.0])
                 self.verts[-1].rotate(math.pi * 2 / self.ngores, 'z')
@@ -104,14 +123,20 @@ class Cone(Molecule):
             self.verts[-1].rotate(math.pi * 2 / self.ngores, 'z')
         
         # Generate points along the end edge
-        self.endheight2d = self.startheight2d + math.sqrt((self.endradius - self.startradius)**2 + (self.endheight3d - self.startheight3d)**2)
+        self.endheight2d = (self.startheight2d 
+                            + math.sqrt((self.endradius - self.startradius)**2 
+                                        + (self.endheight3d - self.startheight3d)**2))
         # Place first vertex pair in 3D space
         if self.cwrot:
             endouter3d = [self.endradius, -self.gorewidth/2, self.diffheight3d]
             self.verts.append(el.Vertex([0.0, self.endheight2d], endouter3d))
             self.verts[-1].rotate(-math.pi * 2 / self.ngores, 'z') 
-            endinner3d = [self.endradius, self.endradius * math.tan(math.pi/self.ngores), self.diffheight3d]
-            endinner3dvis = [self.endradius - visshift, self.endradius * math.tan(math.pi/self.ngores), self.diffheight3d]
+            endinner3d = [self.endradius, 
+                          self.endradius * math.tan(math.pi/self.ngores), 
+                          self.diffheight3d]
+            endinner3dvis = [self.endradius - visshift, 
+                             self.endradius * math.tan(math.pi/self.ngores), 
+                             self.diffheight3d]
             self.verts.append(el.Vertex([self.gorewidth/2 - self.endradius * math.tan(math.pi/self.ngores), 
                                          self.endheight2d], 
                                         endinner3d,
@@ -119,15 +144,19 @@ class Cone(Molecule):
         else: 
             endouter3d = [self.endradius, self.gorewidth/2, self.diffheight3d]
             self.verts.append(el.Vertex([0.0, self.endheight2d], endouter3d))
-            endinner3d = [self.endradius, -self.endradius * math.tan(math.pi/self.ngores), self.diffheight3d]
-            endinner3dvis = [self.endradius - visshift, -self.endradius * math.tan(math.pi/self.ngores), self.diffheight3d]
+            endinner3d = [self.endradius, 
+                          -self.endradius * math.tan(math.pi/self.ngores), 
+                          self.diffheight3d]
+            endinner3dvis = [self.endradius - visshift, 
+                             -self.endradius * math.tan(math.pi/self.ngores), 
+                             self.diffheight3d]
             self.verts.append(el.Vertex([self.gorewidth/2 + self.endradius * math.tan(math.pi/self.ngores), 
                                          self.endheight2d], 
                                         endinner3d,
                                         endinner3dvis))
         
         # Replicate verts for each gore, with the correct rotations and translations
-        for i in range(1, self.ngores):
+        for i in range(1, self.ngores + self.overlap):
             self.verts.append(deepcopy(self.verts[-2]))
             self.verts[-1].translate2d([self.gorewidth, 0.0])
             self.verts[-1].rotate(math.pi * 2 / self.ngores, 'z')
@@ -146,18 +175,18 @@ class Cone(Molecule):
         self.rotate_axis()
         self.translate3d()
         # Select end vertices
-        self.endverts = self.verts[2*self.ngores+1:]
+        self.endverts = self.verts[2*(self.ngores + self.overlap)+1:]
         
     def generateedges(self):
         if self.startedges and len(self.startedges) == self.ngores * 2:
             self.edges = self.startedges
         else:
             # Generate start edges
-            for i in range(0, self.ngores*2, 2):
-                self.edges.append(el.Edge(self.verts[i],                     self.verts[i+1], 'B'))
-                self.edges.append(el.Edge(self.verts[i+1],                   self.verts[i+2], 'B'))
+            for i in range(0, (self.ngores + self.overlap)*2, 2):
+                self.edges.append(el.Edge(self.verts[i],   self.verts[i+1], 'B'))
+                self.edges.append(el.Edge(self.verts[i+1], self.verts[i+2], 'B'))
         # Correct directions of start edges
-        for i in range(0, self.ngores*2, 2):
+        for i in range(0, (self.ngores + self.overlap)*2, 2):
             if self.anglediff == None:
                 pass
             elif abs(self.anglediff) < 0.01 or self.startedgetype == 'none':
@@ -170,26 +199,32 @@ class Cone(Molecule):
                 self.edges[i].direction   = 'M'
                 self.edges[i+1].direction = 'V'
         # Connect start to end edge
-        for i in range(0, self.ngores*2, 2):
-            self.edges.append(el.Edge(self.verts[i],                   self.verts[i+1  + self.ngores*2], 'V'))
-            self.edges.append(el.Edge(self.verts[i+1],                 self.verts[i+2  + self.ngores*2], 'M'))
+        for i in range(0, (self.ngores + self.overlap)*2, 2):
+            self.edges.append(el.Edge(self.verts[i],   
+                                      self.verts[i+1  + (self.ngores + self.overlap)*2], 
+                                      'V'))
+            self.edges.append(el.Edge(self.verts[i+1], 
+                                      self.verts[i+2  + (self.ngores + self.overlap)*2], 
+                                      'M'))
         # Final start to end edge
-        self.edges.append(el.Edge(self.verts[self.ngores*2], self.verts[self.ngores*4+1], 'B'))
+        self.edges.append(el.Edge(self.verts[(self.ngores + self.overlap)*2], 
+                                  self.verts[(self.ngores + self.overlap)*4+1], 
+                                  'B'))
         # Correct first side edge to be a border
-        self.edges[self.ngores*2].direction = 'B'
+        self.edges[(self.ngores + self.overlap)*2].direction = 'B'
         # Connect end edge
-        for i in range(self.ngores*2, self.ngores*4, 2):
+        for i in range((self.ngores + self.overlap)*2, (self.ngores + self.overlap)*4, 2):
             self.edges.append(el.Edge(self.verts[i+1], self.verts[i+2], 'B'))
             self.edges.append(el.Edge(self.verts[i+2], self.verts[i+3], 'B'))
-        self.endedges = self.edges[-self.ngores*2:]
+        self.endedges = self.edges[-(self.ngores + self.overlap)*2:]
         
     
     def generatefaces(self):
         # Add faces
-        for i in range(self.ngores*2):
+        for i in range((self.ngores + self.overlap)*2):
             self.faces.append(el.Face(verts=[self.verts[i], 
-                                             self.verts[i + self.ngores*2 + 1],
-                                             self.verts[i + self.ngores*2 + 2],
+                                             self.verts[i + (self.ngores + self.overlap)*2 + 1],
+                                             self.verts[i + (self.ngores + self.overlap)*2 + 2],
                                              self.verts[i+1]],
                                       edgelist = self.edges))
         #print('faces',len(self.faces))

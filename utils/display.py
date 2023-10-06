@@ -19,7 +19,7 @@ def write_svg_cp(filename, shape, verts=False, edges=True, rules=True):
     #    Y dimensions of all points are translated accordingly.
     
     svg = open(filename,'w')
-    xdim = str(shape.ngores*shape.gorewidth*10)
+    xdim = str((shape.ngores + shape.overlap)*shape.gorewidth*10)
     ydim = str(shape.currentheight2d*10)
     svg.write('''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg 
