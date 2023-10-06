@@ -36,6 +36,10 @@ shape = readinp.generatemodel(blocks)
 t.append(datetime.now())
 print("Model generated, time = ", t[-1] - t[-2])
 
+# Print verts (temp)
+#for v in shape.verts:
+#    print(v.pos2d[0,0], v.pos2d[0,1], v.pos3d[0,0], v.pos3d[0,1], v.pos3d[0,2])
+
 # Convert the 2D/3D positions of points and lines into the requested outputs
 readinp.displaymodel(shape, blocks, basefile)
 t.append(datetime.now())

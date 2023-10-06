@@ -217,17 +217,21 @@ class DiagonalShift(Molecule):
         # Generate remaining points for top and bottom half
         # Then, combine all points into one set of vertices
         ####
-        print('Start verts', len(self.verts))
+        #print('Start verts', len(self.verts))
         self.verts, conv3d, conv2d = self.generatehalftwist(self.verts, conv3d, 
                                                             self.center, self.offsetfract, 
                                                             toptwist=True)
-        print('Lower verts', len(self.verts))
-        print('End   verts', len(topverts))
+        #print('Lower verts', len(self.verts))
+        #print('End   verts', len(topverts))
         self.cwrot = not self.cwrot
         topverts, conv3dtop, conv2dtop = self.generatehalftwist(topverts, conv3d, 
                                                                 topcenter, self.offsetfract,
                                                                 toptwist=False)
-        print('Upper verts', len(topverts))
+        #print('Upper verts', len(topverts))
+        #for v in self.verts:
+        #    print(v.pos2d[0,0], v.pos2d[0,1], v.pos3d[0,0], v.pos3d[0,1], v.pos3d[0,2])
+        #for v in topverts:
+        #    print(v.pos2d[0,0], v.pos2d[0,1], v.pos3d[0,0], v.pos3d[0,1], v.pos3d[0,2])
         
         iconv = (self.ngores + self.overlap)*4 + 3
         dz2d = self.verts[iconv].pos2d[0,1] - topverts[iconv].pos2d[0,1]

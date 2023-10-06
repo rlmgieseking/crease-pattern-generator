@@ -157,7 +157,7 @@ class Molecule:
         target = math.sqrt(dist3d**2 - dx2d**2)
             
         # Compute error in paper lengths for subsequent inner vertices
-        for i in range(1, (self.ngores + self.overlap)):
+        for i in range(1, (self.ngores)):
             dist3d = math.sqrt((verts[i*2+1].pos3d[0,0] - conv[0])**2 +
                                (verts[i*2+1].pos3d[0,1] - conv[1])**2 +
                                (h[i] - h[0])**2)
@@ -200,6 +200,7 @@ class Molecule:
         # Error in y distance
         ydist = np.linalg.norm(verts[i].pos3d - pos3d)
         error.append(ydist - dy)
+        #print(error)
         
         return error
 
@@ -209,15 +210,16 @@ class Molecule:
         #print('height', minheight2d, minheight3d)
         # Solve heights function to get the actual heights of the points
         if toptwist:
-            init = np.array([0.05] + [0] * ((self.ngores + self.overlap) - 1))
+            init = np.array([0.05] + [0] * ((self.ngores) - 1))
         else:
-            init = np.array([-0.05] + [0] * ((self.ngores + self.overlap) - 1))
+            init = np.array([-0.05] + [0] * ((self.ngores) - 1))
         # For relatively small offsets, solve directly
         # For larger offsets, solve for a smaller offset, then scale up
-        if offsetfract < 0.3:
+        if offsetfract <= 0.3:
             zpos = fsolve(self.heights, init, args=(verts, conv3d[0,0:2], toptwist, minheight3d))
         else:
-            for s in np.arange(0.2, offsetfract, 0.1):
+            startfract = ((offsetfract * 10) % 1)/10
+            for s in np.arange(0.2 + startfract, offsetfract + 0.1, 0.1):
                 convtemp = [conv3d[0,0] * s + center[0] * (1-s),
                             conv3d[0,1] * s + center[1] * (1-s)]
                 init = fsolve(self.heights, init, args=(verts, convtemp, toptwist, minheight3d))
@@ -256,9 +258,9 @@ class Molecule:
         for i in range((self.ngores + self.overlap)*2+1):
             verts.append(deepcopy(verts[i]))
             if i % 2 == 1:
-                verts[-1].pos3d[0,2] = - minz + zpos[(i-1)//2] + minheight3d
-                verts[-1].pos3dvis[0,2] = - minz + zpos[(i-1)//2] + minheight3d
-                verts[-1].pos2d[0,1] = - minz + zpos[(i-1)//2] + minheight2d
+                verts[-1].pos3d[0,2] = - minz + zpos[(i-1)//2 % self.ngores] + minheight3d
+                verts[-1].pos3dvis[0,2] = - minz + zpos[(i-1)//2 % self.ngores] + minheight3d
+                verts[-1].pos2d[0,1] = - minz + zpos[(i-1)//2 % self.ngores] + minheight2d
                 #if (toptwist and self.cwrot) or (not toptwist and not self.cwrot):
                 #    verts[-1].pos3dvis[0,2] -= 0.01
                 #else:
@@ -266,18 +268,24 @@ class Molecule:
             else:
                 if self.cwrot:
                     if i == 0:
-                        h = - minz + zpos[i//2] + dfrac * (zpos[i//2] - zpos[self.ngores-1])
+                        h = (- minz + zpos[i//2 % self.ngores] 
+                             + dfrac * (zpos[i//2 % self.ngores] - zpos[self.ngores-1]))
                     elif i == (self.ngores + self.overlap)*2:
-                        h = - minz + zpos[0] + dfrac * (zpos[0] - zpos[(i-2)//2])
+                        h = (- minz + zpos[i//2 % self.ngores]
+                             + dfrac * (zpos[i//2 % self.ngores] - zpos[(i-2)//2 % self.ngores]))
                     else:
-                        h = - minz + zpos[i//2] + dfrac * (zpos[(i)//2] - zpos[(i-2)//2])
+                        h = (- minz + zpos[i//2 % self.ngores] 
+                             + dfrac * (zpos[(i)//2 % self.ngores] - zpos[(i-2)//2 % self.ngores]))
                 else:
                     if i == 0:
-                        h = - minz + zpos[self.ngores-1] - dfrac * (zpos[i//2] - zpos[self.ngores-1])
+                        h = (- minz + zpos[self.ngores-1] 
+                             - dfrac * (zpos[i//2 % self.ngores] - zpos[self.ngores-1]))
                     elif i == (self.ngores + self.overlap)*2:
-                        h = - minz + zpos[(i-2)//2] - dfrac * (zpos[0] - zpos[(i-2)//2])
+                        h = (- minz + zpos[(i-2)//2 % self.ngores] 
+                             - dfrac * (zpos[i//2 % self.ngores] - zpos[(i-2)//2 % self.ngores]))
                     else:
-                        h = - minz + zpos[(i-2)//2] - dfrac * (zpos[(i)//2] - zpos[(i-2)//2])
+                        h = (- minz + zpos[(i-2)//2 % self.ngores] 
+                             - dfrac * (zpos[(i)//2 % self.ngores] - zpos[(i-2)//2 % self.ngores]))
                 verts[-1].pos3d[0,2] = h + minheight3d
                 verts[-1].pos3dvis[0,2] = h + minheight3d
                 verts[-1].pos2d[0,1] = h + minheight2d
@@ -333,20 +341,28 @@ class Molecule:
                 vertind[1] = i*2 + (self.ngores + self.overlap)*4 + 3
                 vertind[2] = vertind[0] + 2
             else:
-                vertind[1] = i*2 + (self.ngores + self.overlap)*4 + 1
-                vertind[2] = vertind[0] + 2 - (self.ngores + self.overlap)*2
+                vertind[1] = i*2 + (self.ngores + self.overlap)*2 + 3
+                vertind[2] = vertind[0] + 2 - (self.ngores)*2
                 
-            #vertind[1] = i*2 + (self.ngores + self.overlap)*4 + 3 if i < (self.ngores + self.overlap) else i*2 + (self.ngores + self.overlap)*4 + 1
-            #vertind[2] = vertind[0] + 2 if i < (self.ngores + self.overlap) else vertind[0] + 2 - (self.ngores + self.overlap)*2
+            #vertind[0] = i*2 + self.ngores*2 + 1
+            #vertind[1] = i*2 + self.ngores*4 + 3 if i < self.ngores else i*2 + self.ngores*4 + 1
+            #vertind[2] = vertind[0] + 2 if i < self.ngores else vertind[0] + 2 - self.ngores*2
             
             v = i*2 + (self.ngores + self.overlap)*4 + 2
-            print(v, vertind)
+            
             #print('vertind', i, v, vertind)
             dx = abs(verts[vertind[1]].pos2d[0,0] - verts[v].pos2d[0,0])
+            dx = verts[vertind[1]].pos2d[0,0] - verts[v].pos2d[0,0]
+            if i == (self.ngores + self.overlap):
+                dx += (self.ngores + self.overlap) * self.gorewidth
+            dx = abs(dx)
             dy = abs(verts[vertind[0]].pos2d[0,1] - verts[v].pos2d[0,1])
+            #print(dx, dy, verts[v].pos3d)
             #print(verts[v].pos3d)
+            #print(v)
             verts[v].pos3d = np.array([fsolve(self.locpt,verts[v].pos3d, 
                                          args=(dx, dy, verts, vertind))])
+            #print(v, 'vis')
             verts[v].pos3dvis = np.array([fsolve(self.locpt,verts[v].pos3dvis, 
                                          args=(dx, dy, verts, vertind))])
             #print(self.locpt(verts[v].pos3d, dx, dy, verts, vertind))
