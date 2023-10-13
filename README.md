@@ -3,19 +3,38 @@ Author: Rebecca Gieseking
 
 Orivase is a Python 3 script that generates crease patterns and 3D visualizations for origami vase forms. As of Version 0.1, the script can create forms based on cones (similar to the capabilities of the ORI-REVO package) and diagonal shifts.
 
-## Setup and installation
+# Setup and installation
 
-## Running the script
+First, follow GitHub's instructions for cloning a repository (https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) to create a copy of the code on your own computer.
 
-As of version 0.1, the script requires a text-based input file (described below). 
+Once you have a local copy, navigate to the `crease-pattern-generator` base directory and use the command:
+
+```
+pip install -r requirements.txt
+```
+
+to install the packages that are needed to run the script.
+
+# Running the script
+
+As of version 0.1, the script requires a text-based input file (described below). Once you have an input file, you can run the script from the `crease-pattern-generator` base directory using the following command:
+
+```
+python orivase.py <filename.txt>
+```
+
+where `<filename.txt>` is replaced by the path and name of your input file.
 
 ## Input file format
+
 The script reads a text-based input file and uses the information in that file to generate the output. The input format is fairly flexible about spacing, capitalization, number of lines, etc. Several example input files are included in the `examples` directory.
 
 ### Comments
-Comments start with the symbol #. Any text from the # to the end of the line will be treated as a comment and discarded when the script reads the input file. The # may appear at the beginning or middle of any line.
+
+Comments start with the symbol `#`. Any text from the `#` to the end of the line will be treated as a comment and discarded when the script reads the input file. The `#` may appear at the beginning or middle of any line.
 
 ### Setup block
+
 In most cases, the input file should start with a setup block. If not, the default setup parameters will be used. An example of a setup block is:
 
 ```
@@ -121,3 +140,34 @@ Within the block, the possible options are:
 
 ### Display and output
 
+By default, the script creates 5 different outputs, two including the 2D crease pattern and three including the 3D folded form. The output types are:
+
+1. `svpcp`: Crease pattern in .svg format, which is a common vector graphics format
+2. `vpy`: Interactive 3D VPython visualization that can be rotated, zoomed, etc., which opens in your default browser
+3. `vpy_script`: Prints a VPython script to visualize the 3D model that can be used at https://www.glowscript.org/ to create a web-based 3D interactive visualization
+4. `fold2d`: Crease pattern in .fold format (see https://github.com/edemaine/fold for details)
+5. `fold3d`: 3D folded form in .fold format
+
+The specific options are:
+
+| Option      | Default | Description |
+| ------      | ------- | ----------- |
+svgcp         |  True   | If True, prints a crease pattern in .svg format
+svgcp_verts   |  False  | If True, .svg crease pattern includes points for each vertex
+svgcp_edges   |  True   | If True, .svg crease pattern includes borders (black) and folded edges (mountain = red, valley = blue)
+svgcp_rules   |  True   | If True, .svg crease pattern includes rule lines as light gray lines
+vpy           |  True   | If True, generates an interactive 3D visualization of the folded model using VPython, which will open in your default browser. This visualization can be rotated, zoomed, etc.
+vpy_script    |  False  | If True, prints a VPython script that can be used at https://www.glowscript.org/ to create a web-based 3D interactive visualization
+vpy_verts     |  False  | If True, 3D visualization includes points for each vertex
+vpy_edges     |  True   | If True, 3D visualization includes black lines for each border and folded edge
+vpy_faces     |  True   | If True, 3D visualization includes colored/shaded faces
+vpy_image     |  True   | If True, 3D visualization also saves a .png image file of the default view
+fold2d        |  True   | If True, prints a .fold file of the 2D crease pattern
+fold2d_verts  |  True   | If True, 2D .fold file includes vertex coordinates
+fold2d_edges  |  True   | If True, 2D .fold file includes vertex indices and fold assignments (mountain, valley, etc.) for each edge
+fold2d_faces  |  True   | If True, 2D .fold file includes vertex indices for each face
+fold3d        |  True   | If True, prints a .fold file of the 3D folded form
+fold3d_verts  |  True   | If True, 3D .fold file includes vertex coordinates
+fold3d_edges  |  True   | If True, 3D .fold file includes vertex indices and fold assignments (mountain, valley, etc.) for each edge
+fold3d_faces  |  True   | If True, 2D .fold file includes vertex indices for each face
+                  

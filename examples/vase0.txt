@@ -9,3 +9,7 @@ add cone
   height     1.0
   radius     0.5
 end
+display
+  vpy True
+  vpy_script True
+end

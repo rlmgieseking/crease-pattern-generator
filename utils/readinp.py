@@ -33,6 +33,7 @@ displayvars =    [['svgcp',          bool,  True],
                   ['svgcp_edges',    bool,  True],
                   ['svgcp_rules',    bool,  True],
                   ['vpy',            bool,  True],
+                  ['vpy_script',     bool,  False],
                   ['vpy_verts',      bool,  False],
                   ['vpy_edges',      bool,  True],
                   ['vpy_faces',      bool,  True],
@@ -44,7 +45,7 @@ displayvars =    [['svgcp',          bool,  True],
                   ['fold3d',         bool,  True],
                   ['fold3d_verts',   bool,  True],
                   ['fold3d_edges',   bool,  True],
-                  ['fold3d_faces',   bool,  True],]
+                  ['fold3d_faces',   bool,  True]]
 
 def getvar(block, varname, vartype, vardefault):
     var = None
@@ -194,6 +195,8 @@ def displaymodel(shape, blocks, basefile):
         display.write_svg_cp(basefile+'.svg', shape, verts=svgcp_verts, edges=svgcp_edges, rules=svgcp_rules)
     if vpy:
         display.vpython3d(basefile+'.png', shape, verts=vpy_verts, edges=vpy_edges, faces=vpy_faces, savefile=vpy_image)
+    if vpy_script:
+        display.glowscript(basefile+'_vpy.py', shape, verts=vpy_verts, edges=vpy_edges, faces=vpy_faces)
     if fold2d:
         display.fold2d(basefile+'_2D.fold', shape, verts=fold2d_verts, edges=fold2d_edges, faces=fold2d_faces)
     if fold3d:
