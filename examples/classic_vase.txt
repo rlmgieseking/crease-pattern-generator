@@ -1,8 +1,8 @@
-# Simple vase
-SETUP
-  nGores  =  8 
-  gorewidth  2.0
-  radius     0.0
+# Classic vase shape, with a wide belly, narrow neck, and flare at the top edge
+setup
+  ngores     8 
+  gorewidth  2
+  radius     0
   overlap    1
 end 
 add cone
@@ -10,7 +10,7 @@ add cone
   radius     0.5
 end
 add cone
-  height     1.5
+  height     1.2
   radius     1.0
 end
 add cone
@@ -19,11 +19,11 @@ add cone
   startedge  none
 end
 add cone
-  height     0.2
-  radius     0.5
+  height     0.4
+  radius     0.3
   startedge  none
 end 
 add cone
-  height     0.3
+  height     0.8
   radius     0.6
 end

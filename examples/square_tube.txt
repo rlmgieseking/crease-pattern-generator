@@ -1,0 +1,11 @@
+# Square flat twist
+setup
+  ngores     4
+  gorewidth  2
+  radius     0.5
+  overlap    1
+end 
+add cone
+  height     1
+  radius     0.5
+end

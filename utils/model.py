@@ -83,6 +83,7 @@ class Model:
             startverts, startedges = self.molecules[-1].endverts, self.molecules[-1].endedges
         else:
             startverts, startedges = None, None
+        print(startedgetype)
         self.molecules.append(Cone(ngores = self.ngores, 
                                    gorewidth = self.gorewidth, 
                                    cwrot = self.cwrot, 
@@ -188,8 +189,10 @@ class Model:
         for i in range(1, len(rotpts)):
             if i == 1:
                 startedge = startedgetype
+                #print(startedge)
             else:
                 startedge = 'none'
+                #print(startedge)
             self.add_cone(rotpts[i][0], 
                           rotpts[i][1]-rotpts[i-1][1], 
                           startedge, 

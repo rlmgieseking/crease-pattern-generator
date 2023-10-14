@@ -5,9 +5,11 @@ Orivase is a Python 3 script that generates crease patterns and 3D visualization
 
 # Setup and installation
 
+You must have Python 3 installed to run this script.
+
 First, follow GitHub's instructions for cloning a repository (https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) to create a copy of the code on your own computer.
 
-Once you have a local copy, navigate to the `crease-pattern-generator` base directory and use the command:
+Once you have a local copy, use the command line to navigate to the `crease-pattern-generator` base directory and use the command:
 
 ```
 pip install -r requirements.txt
@@ -27,7 +29,9 @@ where `<filename.txt>` is replaced by the path and name of your input file.
 
 ## Input file format
 
-The script reads a text-based input file and uses the information in that file to generate the output. The input format is fairly flexible about spacing, capitalization, number of lines, etc. Several example input files are included in the `examples` directory.
+The script reads a text-based input file and uses the information in that file to generate the output. The input format is flexible about spacing, number of options per line, etc. The input is not case-sensitive. Several example input files are included in the `examples` directory.
+
+The input interpreter is set up to correct errors and give a final model as often as possible. If an invalid value is given (for example, a non-numerical value for an option that needs a number), the script will use the default value of that option. If the same option is defined twice within the same block, the script will only use the value that is defined first.
 
 ### Comments
 

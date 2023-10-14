@@ -1,15 +1,15 @@
 # Simple vase
-setup
-  ngores  =  4
-  gorewidth  1.0
+SETUP ngores=6
+  gorewidth  
+  gorewidth  g
+  gorewidth  1
   radius     0.5
-  overlap    1
-end 
+  overlap
+end junk
 add cone
   height     1.0
   radius     0.5
 end
 display
-  vpy True
-  vpy_script True
+  vpy T
 end

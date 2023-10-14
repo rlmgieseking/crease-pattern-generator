@@ -7,6 +7,7 @@ Created on Thu Mar  9 16:28:19 2023
 
 import utils.model as model
 import utils.display as display
+import re
 
 # Define variables available for each block and their default values
 setupvars =      [['ngores',         int,   8], 
@@ -50,17 +51,21 @@ displayvars =    [['svgcp',          bool,  True],
 def getvar(block, varname, vartype, vardefault):
     var = None
     if varname in block:
-        try:
-            if vartype == bool:
-                var = eval(block[block.index(varname)+1].capitalize())
-            else:
-                var = vartype(block[block.index(varname)+1])
-            block.pop(block.index(varname)+1)
-            block.pop(block.index(varname))
-        except:
-            print('Error:', varname, block[block.index(varname)+1],
-                  'is not a', vartype, '. Using the default value of', vardefault)
+        if block.index(varname) == len(block) - 1:
             var = vardefault
+            print('Error: Value could not be found for',varname)
+        else:
+            try:
+                if vartype == bool:
+                    var = eval(block[block.index(varname)+1].capitalize())
+                else:
+                    var = vartype(block[block.index(varname)+1])
+                block.pop(block.index(varname)+1)
+                block.pop(block.index(varname))
+            except:
+                print('Error:', varname, 'value of', block[block.index(varname)+1],
+                      'is not a', vartype, '. Using the default value of', vardefault)
+                var = vardefault
     else:
         var = vardefault
     return block, var
@@ -80,22 +85,24 @@ def readfile(inpfile):
             itext[i] = itext[i][:itext[i].find('#')]
         if len(itext[i]) == 0:
             itext.pop(i)
-    # print(itext)
+    #print(itext)
     
     # Split text into blocks
     while len(itext) > 0:
-        block = itext[0].split()
-        while 'end' not in itext[0] and len(itext) > 0:
-            itext.pop(0)
-            line = itext[0].split()
-            for word in line:
-                block.append(word) if word != '=' else None
+        block = []
+        while 'end' not in block and len(itext) > 0:
+            block.extend(re.split(" |,|=",itext.pop(0)))
+            #line = line.split()
+            #for word in line:
+            #    block.append(word) 
+        block= list(filter(None,block))
+        #print(block)
         if block.index('end') != len(block) - 1:
             print("Error: Variables after end statement will be ignored. Ignoring ", 
                   block[block.index('end')+1:])    
         block = block[:block.index('end')]
         blocks.append(block)
-        itext.pop(0)
+        #itext.pop(0)
     #print(blocks)
     return blocks
 

@@ -1,0 +1,25 @@
+# Vase form using curved cones to create smoother curved forms
+setup
+  ngores    16 
+  gorewidth  2.0
+  radius     0
+end 
+add cone
+  height        0
+  radius        0.4
+end
+add curvedcone
+  height        2.0
+  radius        0.5
+  vertexheight  1.5
+  vertexradius  1
+  nsegments     8
+end
+add curvedcone
+  height        0.8
+  radius        0.5
+  vertexheight  0.4
+  vertexradius  0.1
+  nsegments     8
+  startedge     none
+end

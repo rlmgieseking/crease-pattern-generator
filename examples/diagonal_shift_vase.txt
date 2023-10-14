@@ -1,0 +1,34 @@
+# Diagonal shift vase
+setup
+  ngores      16
+  gorewidth   2
+  radius      0
+  cwrot       True
+  overlap     1
+end 
+add cone
+  height      0
+  radius      0.5
+end
+add curvedcone
+  height      0.8
+  radius      1
+  vertexheight 0.4
+  vertexradius 0.9
+end
+add diagshift
+  radius       0.5
+  offsetfract  0.4
+  tiltrot      0
+end
+add diagshift
+  radius       1.0
+  offsetfract  0.4
+  tiltrot      90
+end
+add curvedcone
+  height      0.8
+  radius      0.5
+  vertexheight 0.4
+  vertexradius 0.9
+end

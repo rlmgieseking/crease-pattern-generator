@@ -1,0 +1,38 @@
+# Tube with width alternating between full width and 20% of maximum radius
+setup
+  ngores     8 
+  gorewidth  2
+  radius     1
+end 
+add cone
+  height     0.5
+  radius     0.2
+end
+add cone
+  height     0.5
+  radius     1.0
+end
+add cone
+  height     0.5
+  radius     0.2
+end
+add cone
+  height     0.5
+  radius     1.0
+end
+add cone
+  height     0.5
+  radius     0.2
+end
+add cone
+  height     0.5
+  radius     1.0
+end
+add cone
+  height     0.5
+  radius     0.2
+end
+add cone
+  height     0.5
+  radius     1.0
+end

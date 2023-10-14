@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg 
+  xmlns="http://www.w3.org/2000/svg"
+  id="svg8"
+  version="1.1" 
+  height="10.000000000000002mm" 
+  width="100.0mm">
+<g>
+  <line x1="0.0mm" y1="10.000000000000002mm" x2="15.0mm" y2="10.000000000000002mm" stroke="black" stroke-width="2" />
+  <line x1="15.0mm" y1="10.000000000000002mm" x2="20.0mm" y2="10.000000000000002mm" stroke="black" stroke-width="2" />
+  <line x1="20.0mm" y1="10.000000000000002mm" x2="35.0mm" y2="10.000000000000002mm" stroke="black" stroke-width="2" />
+  <line x1="35.0mm" y1="10.000000000000002mm" x2="40.0mm" y2="10.000000000000002mm" stroke="black" stroke-width="2" />
+  <line x1="40.0mm" y1="10.000000000000002mm" x2="55.0mm" y2="10.000000000000002mm" stroke="black" stroke-width="2" />
+  <line x1="55.0mm" y1="10.000000000000002mm" x2="60.0mm" y2="10.000000000000002mm" stroke="black" stroke-width="2" />
+  <line x1="60.0mm" y1="10.000000000000002mm" x2="75.0mm" y2="10.000000000000002mm" stroke="black" stroke-width="2" />
+  <line x1="75.0mm" y1="10.000000000000002mm" x2="80.0mm" y2="10.000000000000002mm" stroke="black" stroke-width="2" />
+  <line x1="80.0mm" y1="10.000000000000002mm" x2="95.0mm" y2="10.000000000000002mm" stroke="black" stroke-width="2" />
+  <line x1="95.0mm" y1="10.000000000000002mm" x2="100.0mm" y2="10.000000000000002mm" stroke="black" stroke-width="2" />
+  <line x1="0.0mm" y1="10.000000000000002mm" x2="0.0mm" y2="0.0mm" stroke="black" stroke-width="2" />
+  <line x1="15.0mm" y1="10.000000000000002mm" x2="15.0mm" y2="0.0mm" stroke="red" stroke-width="1.5" />
+  <line x1="20.0mm" y1="10.000000000000002mm" x2="20.0mm" y2="0.0mm" stroke="blue" stroke-width="1.5" />
+  <line x1="35.0mm" y1="10.000000000000002mm" x2="35.0mm" y2="0.0mm" stroke="red" stroke-width="1.5" />
+  <line x1="40.0mm" y1="10.000000000000002mm" x2="40.0mm" y2="0.0mm" stroke="blue" stroke-width="1.5" />
+  <line x1="55.0mm" y1="10.000000000000002mm" x2="55.0mm" y2="0.0mm" stroke="red" stroke-width="1.5" />
+  <line x1="60.0mm" y1="10.000000000000002mm" x2="60.0mm" y2="0.0mm" stroke="blue" stroke-width="1.5" />
+  <line x1="75.0mm" y1="10.000000000000002mm" x2="75.0mm" y2="0.0mm" stroke="red" stroke-width="1.5" />
+  <line x1="80.0mm" y1="10.000000000000002mm" x2="80.0mm" y2="0.0mm" stroke="blue" stroke-width="1.5" />
+  <line x1="95.0mm" y1="10.000000000000002mm" x2="95.0mm" y2="0.0mm" stroke="red" stroke-width="1.5" />
+  <line x1="100.0mm" y1="10.000000000000002mm" x2="100.0mm" y2="0.0mm" stroke="black" stroke-width="2" />
+  <line x1="0.0mm" y1="0.0mm" x2="15.0mm" y2="0.0mm" stroke="black" stroke-width="2" />
+  <line x1="15.0mm" y1="0.0mm" x2="20.0mm" y2="0.0mm" stroke="black" stroke-width="2" />
+  <line x1="20.0mm" y1="0.0mm" x2="35.0mm" y2="0.0mm" stroke="black" stroke-width="2" />
+  <line x1="35.0mm" y1="0.0mm" x2="40.0mm" y2="0.0mm" stroke="black" stroke-width="2" />
+  <line x1="40.0mm" y1="0.0mm" x2="55.0mm" y2="0.0mm" stroke="black" stroke-width="2" />
+  <line x1="55.0mm" y1="0.0mm" x2="60.0mm" y2="0.0mm" stroke="black" stroke-width="2" />
+  <line x1="60.0mm" y1="0.0mm" x2="75.0mm" y2="0.0mm" stroke="black" stroke-width="2" />
+  <line x1="75.0mm" y1="0.0mm" x2="80.0mm" y2="0.0mm" stroke="black" stroke-width="2" />
+  <line x1="80.0mm" y1="0.0mm" x2="95.0mm" y2="0.0mm" stroke="black" stroke-width="2" />
+  <line x1="95.0mm" y1="0.0mm" x2="100.0mm" y2="0.0mm" stroke="black" stroke-width="2" />
+</g>
+</svg>
