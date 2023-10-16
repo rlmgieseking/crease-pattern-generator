@@ -62,7 +62,11 @@ class Cone(Molecule):
         self.generateverts()
         self.generateedges()
         self.generatefaces()
-
+        #print('cone',self.startedgetype)
+        #if self.startverts:
+        #    print('startverts', len(self.startverts))
+        #else:
+        #    print('startverts none')
         #print('End   cone',datetime.now())
     
     # Set up all vertices for the cone
@@ -178,7 +182,7 @@ class Cone(Molecule):
         self.endverts = self.verts[2*(self.ngores + self.overlap)+1:]
         
     def generateedges(self):
-        if self.startedges and len(self.startedges) == self.ngores * 2:
+        if self.startedges and len(self.startedges) == (self.ngores + self.overlap)*2:
             self.edges = self.startedges
         else:
             # Generate start edges
@@ -217,7 +221,8 @@ class Cone(Molecule):
             self.edges.append(el.Edge(self.verts[i+1], self.verts[i+2], 'B'))
             self.edges.append(el.Edge(self.verts[i+2], self.verts[i+3], 'B'))
         self.endedges = self.edges[-(self.ngores + self.overlap)*2:]
-        
+        #for e in self.edges:
+        #    print(e.direction)
     
     def generatefaces(self):
         # Add faces

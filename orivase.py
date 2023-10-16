@@ -16,8 +16,8 @@ t.append(datetime.now())
 # Program requires a text input file (details in README.md)
 # Get input file name
 if len(sys.argv) <= 1:
-    #inpfile = input("Enter the OriVase input file name: ")
-    inpfile = 'examples/diagonal_shift_vase.txt'
+    inpfile = input("Enter the OriVase input file name: ")
+    #inpfile = 'examples/diagonal_shift_vase.txt'
 else:
     inpfile = sys.argv[1]
 

@@ -14,12 +14,13 @@ add curvedcone
   height      0.8
   radius      1
   vertexheight 0.4
-  vertexradius 0.9
+  vertexradius 0.85
 end
 add diagshift
   radius       0.5
   offsetfract  0.4
   tiltrot      0
+  startedge    none
 end
 add diagshift
   radius       1.0
@@ -30,5 +31,6 @@ add curvedcone
   height      0.8
   radius      0.5
   vertexheight 0.4
-  vertexradius 0.9
+  vertexradius 0.85
+  startedge    none
 end

@@ -83,7 +83,7 @@ class Model:
             startverts, startedges = self.molecules[-1].endverts, self.molecules[-1].endedges
         else:
             startverts, startedges = None, None
-        print(startedgetype)
+        #print(startedgetype)
         self.molecules.append(Cone(ngores = self.ngores, 
                                    gorewidth = self.gorewidth, 
                                    cwrot = self.cwrot, 
