@@ -5,7 +5,7 @@ Orivase is a Python 3 script that generates crease patterns and 3D visualization
 
 # Setup and installation
 
-1. Install Python 3
+1. **Install Python 3**
 
 You must have Python 3 installed and accessible from the command line to run this script. To check whether you have python installed, open either Command Prompt (Windows) or Terminal (Mac) and type:
 
@@ -29,11 +29,11 @@ to open the Microsoft store link to the latest version of Python and follow the 
 
 On Mac, follow Python's installation instructions at https://docs.python.org/3/using/mac.html.
 
-2. Download OriVase
+2. **Download OriVase**
 
 Follow GitHub's instructions for cloning a repository (https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) to create a copy of the code on your own computer.
 
-3. Navigate to OriVase on the command line.
+3. **Navigate to OriVase on the command line.**
 
 Find the path to the directory where you downloaded OriVase and use the command:
 
@@ -43,7 +43,7 @@ cd /path/to/crease-pattern-generator
 
 where `/path/to/crease-pattern-generator` is replaced with your actual directory path for OriVase.
 
-4. Install the necessary Python libraries
+4. **Install the necessary Python libraries**
 
 The base installation of Python does not include all the libraries used for OriVase. From the `crease-pattern-generator` base directory, use the command:
 
@@ -53,7 +53,7 @@ pip install -r requirements.txt
 
 to install the packages that are needed to run the script.
 
-5. Run an example file.
+5. **Run an example file.**
 
 Once all of the libraries are installed, use the command:
 
