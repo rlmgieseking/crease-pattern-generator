@@ -5,11 +5,47 @@ Orivase is a Python 3 script that generates crease patterns and 3D visualization
 
 # Setup and installation
 
-You must have Python 3 installed to run this script.
+1. Install Python 3
 
-First, follow GitHub's instructions for cloning a repository (https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) to create a copy of the code on your own computer.
+You must have Python 3 installed and accessible from the command line to run this script. To check whether you have python installed, open either Command Prompt (Windows) or Terminal (Mac) and type:
 
-Once you have a local copy, use the command line to navigate to the `crease-pattern-generator` base directory and use the command:
+```
+python --version
+```
+
+and hit enter to run the command. If Python is installed, your command line program will print the version of Python you have installed:
+
+```
+Python 3.11.1
+```
+
+If your version number is 3.8 or higher, you can continue to the next step. If you have an older version installed or do not have Python installed (error message of `Python was not found` or similar), then install a current version of Python 3. On Windows, Python's official instructions are at https://docs.python.org/3/using/windows.html. The simplest way to install is to use the command:
+
+```
+python
+```
+
+to open the Microsoft store link to the latest version of Python and follow the installation instructions.
+
+On Mac, follow Python's installation instructions at https://docs.python.org/3/using/mac.html.
+
+2. Download OriVase
+
+Follow GitHub's instructions for cloning a repository (https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) to create a copy of the code on your own computer.
+
+3. Navigate to OriVase on the command line.
+
+Find the path to the directory where you downloaded OriVase and use the command:
+
+```
+cd /path/to/crease-pattern-generator
+```
+
+where `/path/to/crease-pattern-generator` is replaced with your actual directory path for OriVase.
+
+4. Install the necessary Python libraries
+
+The base installation of Python does not include all the libraries used for OriVase. From the `crease-pattern-generator` base directory, use the command:
 
 ```
 pip install -r requirements.txt
@@ -17,15 +53,25 @@ pip install -r requirements.txt
 
 to install the packages that are needed to run the script.
 
+5. Run an example file.
+
+Once all of the libraries are installed, use the command:
+
+```
+python orivase.py examples/classic_vase.txt
+```
+
+to run one of the provided example inputs. If everything is installed correctly, an interactive 3D visualization of the vase should open in your default browser.
+
 # Running the script
 
 As of version 0.1, the script requires a text-based input file (described below). Once you have an input file, you can run the script from the `crease-pattern-generator` base directory using the following command:
 
 ```
-python orivase.py <filename.txt>
+python orivase.py folder/filename.txt
 ```
 
-where `<filename.txt>` is replaced by the path and name of your input file.
+where `folder/filename.txt` is replaced by the path and name of your input file.
 
 ## Input file format
 
