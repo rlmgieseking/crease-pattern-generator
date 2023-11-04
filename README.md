@@ -3,6 +3,16 @@ Author: Rebecca Gieseking
 
 Orivase is a Python 3 script that generates crease patterns and 3D visualizations for origami vase forms. As of Version 0.1, the script can create forms based on cones (similar to the capabilities of the ORI-REVO package) and diagonal shifts.
 
+## Examples
+
+I have several example models set up in the `examples` directory. The crease patterns and corresponding interactive 3D visualizations are:
+
+- **Classic Vase:** [Crease pattern](https://github.com/rlmgieseking/crease-pattern-generator/blob/main/examples/classic_vase.svg), [3D visualization](https://www.glowscript.org/#/user/giesekingorigami/folder/OriVase/program/classicvase)
+- **Curved Vase:** [Crease pattern](https://github.com/rlmgieseking/crease-pattern-generator/blob/main/examples/curved_vase.svg), [3D visualization](https://www.glowscript.org/#/user/giesekingorigami/folder/OriVase/program/curvedvase)
+- **Diagonal Shift Vase:** [Crease pattern](https://github.com/rlmgieseking/crease-pattern-generator/blob/main/examples/diagonal_shift_vase.svg), [3D visualization](https://www.glowscript.org/#/user/giesekingorigami/folder/OriVase/program/diagonalshiftvase)
+- **Square Tube:** [Crease pattern](https://github.com/rlmgieseking/crease-pattern-generator/blob/main/examples/square_tube.svg), [3D visualization](https://www.glowscript.org/#/user/giesekingorigami/folder/OriVase/program/squaretube)
+- **Zigzag Tube:** [Crease pattern](https://github.com/rlmgieseking/crease-pattern-generator/blob/main/examples/zigzag_tube.svg), [3D visualization](https://www.glowscript.org/#/user/giesekingorigami/folder/OriVase/program/zigzagtube)
+
 # Setup and installation
 
 1. **Install Python 3**
